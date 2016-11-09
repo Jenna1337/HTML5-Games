@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<head>
+<link rel="stylesheet" href="assets/styles/Common.css">
+<script src="assets/script/javascript/KeyListener.js"></script>
+<script src="assets/script/javascript/CanvasTools.js"></script>
+<script src="assets/script/javascript/GameObject.js"></script>
+<script src="assets/script/javascript/GameCanvas.js"></script>
+<script>
+ship = new GameObject("assets/img/ship.png", 20, 40, -90);
+var shipspd = 2;
+var gamecanvas;
+var gamespd = 30;
+var keyleft = false;
+var keyright = false;
+function onload(){
+	gamecanvas = new GameCanvas("gamecanvas", 
+function(canvas)
+{
+	if(keyleft)
+		//move ship left
+		ship.x -= shipspd;
+	if(keyright)
+		//move ship right
+		ship.x += shipspd;
+});
+	gamecanvas.gamespeed = gamespd;
+	gamecanvas.addGameObject(ship);
+	addKeyListener(document, "A", function(key){
+		keyleft = true;
+	}, function(key){
+		keyleft = false;
+	});
+	addKeyListener(document, "D", function(key){
+		keyright = true;
+	}, function(key){
+		keyright = false;
+	});
+	addKeyListener(document, "W", function(key){
+		//shoot bullet
+		
+	});
+	addKeyListener(document, "S", function(key){
+		
+	});
+};
+</script>
+</head>
+<body onload="onload()">
+<div id="warning" class="bigred blink-fade">This game is under construction</div>
+<canvas id="gamecanvas" width="200px" height="100px" style="border:1px solid #000000;"></canvas>
+<div id="ship.vector.angle"></div>
+<div id="ship.vector.velocity"></div>
+</body>

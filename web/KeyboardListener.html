@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<head>
+<script src="assets/script/javascript/KeyListener.js"></script>
+<script>
+function onload(){
+	addKeyListener(document, "A", function(key){
+		document.getElementById("text").innerHTML += 1;
+	});
+	addKeyListener(document, "S", function(key){
+		document.getElementById("text").innerHTML += 2;
+	});
+};
+</script>
+</head>
+<body onload="onload();">
+<table>
+	<tr>
+		<td style="text-align: right;">keydown:</td>
+		<td id="keydown">0 = NULL</td>
+	</tr>
+	<tr>
+		<td style="text-align: right;">keyup:  </td>
+		<td id="keyup"  >0 = NULL</td>
+	</tr>
+</table>
+</body>

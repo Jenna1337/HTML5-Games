@@ -1,0 +1,13 @@
+.bigred{
+	font: bold 20px sans-serif;
+	color: red;
+}
+.blink-step {
+    animation: blinker 1s steps(1) infinite;
+}
+.blink-fade {
+    animation: blinker 1s linear infinite;
+}
+@keyframes blinker {
+    50% { opacity: 0.0; }
+}
