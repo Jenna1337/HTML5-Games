@@ -6,8 +6,8 @@
 <script src="assets/script/javascript/GameObject.js"></script>
 <script src="assets/script/javascript/GameCanvas.js"></script>
 <script>
-ship = new GameObject("assets/img/ship.png", 20, 40, -90);
-var shipspd = 2;
+var ship;
+var shipspd = 1;
 var gamecanvas;
 var gamespd = 30;
 var keyleft = false;
@@ -23,6 +23,8 @@ function(canvas)
 		//move ship right
 		ship.x += shipspd;
 });
+	ship = new GameObject("assets/img/invaders/ship_1.png", 20, 0, 0);
+	ship.y = gamecanvas.canvas.height-ship.img.width;
 	gamecanvas.gamespeed = gamespd;
 	gamecanvas.addGameObject(ship);
 	addKeyListener(document, "A", function(key){

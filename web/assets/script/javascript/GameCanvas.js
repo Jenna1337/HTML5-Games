@@ -1,23 +1,4 @@
 
-function redraw(val, Func)
-{
-	var gmcanv = val.Value;
-	var canvas = document.getElementById(gmcanv.canvasname);
-	Func(canvas);
-	if(typeof(gmcanv.gameObjects)!="undefined" && gmcanv.gameObjects!=null
-		&& typeof(canvas)!="undefined" && canvas!=null)
-	{
-		var ctx = canvas.getContext("2d");
-		ctx.beginPath();
-		ctx.rect(0, 0, ctx.width, ctx.height);
-		canvas.fillStyle = "blue";
-		ctx.fill();
-		for(var i=0; i<gmcanv.gameObjects.length; ++i)
-			gmcanv.gameObjects[i].paint(ctx);
-	}
-	setTimeout(
-		function(){redraw(val, Func)}, gmcanv.gamespeed);
-}
 function GameCanvas(canvasname, funcpaint)
 {
 	if(typeof(funcpaint)=="undefined" || funcpaint==null)
@@ -30,8 +11,20 @@ function GameCanvas(canvasname, funcpaint)
 	
 	var THIS = {Value: this};
 	this.paint = function(){
-		setTimeout(
-			function(){redraw(THIS, funcpaint)}, THIS.gamespeed);
+		this.canvas = document.getElementById(this.canvasname);
+		funcpaint(this.canvas);
+		if(typeof(this.gameObjects)!="undefined" && this.gameObjects!=null
+			&& typeof(this.canvas)!="undefined" && this.canvas!=null)
+		{
+			var ctx = this.canvas.getContext("2d");
+			ctx.beginPath();
+			ctx.rect(0, 0, ctx.width, ctx.height);
+			this.canvas.fillStyle = "blue";
+			ctx.fill();
+			for(var i=0; i<this.gameObjects.length; ++i)
+				this.gameObjects[i].paint(ctx);
+		}
+		setTimeout(this.paint, this.gamespeed);
 	};
 	this.addGameObject = function(gameobj)
 	{
