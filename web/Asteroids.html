@@ -12,8 +12,8 @@ var deltamax = 2.5;
 var shipacc = 0.1;
 var shipmax = 0.5;
 var gamecanvas;
-function onload(){
-	gamecanvas = new GameCanvas("gamecanvas", 
+function loadgame(cname){
+	gamecanvas = new GameCanvas(cname, 
 function(canvas)
 {
 	ship.spin = Math.min(Math.max(-deltamax, ship.spin), deltamax);
@@ -50,7 +50,7 @@ function(canvas)
 };
 </script>
 </head>
-<body onload="onload()">
+<body onload="loadgame('gamecanvas')">
 <div id="warning" class="bigred blink-step">This game is under construction</div>
 <canvas id="gamecanvas" width="200px" height="100px" style="border:1px solid #000000;"></canvas>
 <div id="ship.vector.angle"></div>

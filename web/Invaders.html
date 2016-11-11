@@ -12,10 +12,13 @@ var gamecanvas;
 var gamespd = 30;
 var keyleft = false;
 var keyright = false;
-function onload(){
-	gamecanvas = new GameCanvas("gamecanvas", 
+function loadgame(cname){
+	gamecanvas = new GameCanvas(cname, 
 function(canvas)
 {
+	var gamemargin = gamecanvas.getMargins();
+	keyleft = keyleft && ship.x > gamemargin.left;
+	keyright = keyright && ship.x < gamemargin.right;
 	if(keyleft)
 		//move ship left
 		ship.x -= shipspd;
@@ -23,17 +26,20 @@ function(canvas)
 		//move ship right
 		ship.x += shipspd;
 });
+	var canvas = document.getElementById(cname);
 	ship = new GameObject("assets/img/invaders/ship_1.png", 20, 0, 0);
-	ship.y = gamecanvas.canvas.height-ship.img.width;
+	ship.y = canvas.height-ship.img.width;
 	gamecanvas.gamespeed = gamespd;
 	gamecanvas.addGameObject(ship);
 	addKeyListener(document, "A", function(key){
-		keyleft = true;
+		var gamemargin = gamecanvas.getMargins();
+		keyleft = ship.x > gamemargin.left;
 	}, function(key){
 		keyleft = false;
 	});
 	addKeyListener(document, "D", function(key){
-		keyright = true;
+		var gamemargin = gamecanvas.getMargins();
+		keyright = ship.x < gamemargin.right;
 	}, function(key){
 		keyright = false;
 	});
@@ -47,7 +53,7 @@ function(canvas)
 };
 </script>
 </head>
-<body onload="onload()">
+<body onload="loadgame('gamecanvas')">
 <div id="warning" class="bigred blink-fade">This game is under construction</div>
 <canvas id="gamecanvas" width="200px" height="100px" style="border:1px solid #000000;"></canvas>
 <div id="ship.vector.angle"></div>
