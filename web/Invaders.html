@@ -25,7 +25,7 @@ function(canvas)
 	if(keyright)
 		//move ship right
 		ship.x += shipspd;
-});
+}, 10);
 	var canvas = document.getElementById(cname);
 	ship = new GameObject("assets/img/invaders/ship_1.png", 20, 0, 0);
 	ship.y = canvas.height-ship.img.width;

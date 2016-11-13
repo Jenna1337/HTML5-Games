@@ -2,8 +2,6 @@ var RAD = Math.PI/180;
 function Vector(angle, velocity)
 {
 	this.angle = angle;
-	if(this.angle==NaN)
-		this.angle = 0;
 	this.velocity = velocity;
 	this.addVector = function(vector)
 	{
@@ -12,6 +10,12 @@ function Vector(angle, velocity)
 			this.translate(vector.angle, vector.velocity);
 		}
 	};
+	this.getCoords = function()
+	{
+		var x = Math.cos(this.angle)*this.velocity;
+		var y = Math.sin(this.angle)*this.velocity;
+		return ({x: x, y: y});
+	}
 	this.translate = function(angle, velocity)
 	{
 		//cos = a/h
@@ -26,24 +30,20 @@ function Vector(angle, velocity)
 		//   /__| 
 		//    a1
 		//
-		var t1 = RAD*this.angle;
-		var t2 = RAD*angle;
-		var v1 = this.velocity;
-		var v2 = velocity;
-		//               a/h*h
-		var a1 = Math.cos(t1)*v1;
-		//               o/h*h
-		var o1 = Math.sin(t1)*v1;
-		//               a/h*h
-		var a2 = Math.cos(t2)*v2;
-		//               o/h*h
-		var o2 = Math.sin(t2)*v2;
-		//   o
-		var dx = a1 + a2;
-		//   a
-		var dy = o1 + o2;
-		this.angle = Math.atan(dy/dx)/RAD;
-		if(this.angle==NaN)
+		var c1 = new Vector(RAD*this.angle, this.velocity).getCoords();
+		var c2 = new Vector(RAD*angle, velocity).getCoords();
+		var dx = c1.x + c2.x;
+		var dy = c1.y + c2.y;
+		if(dx>=0 && dy>=0)//q1
+			this.angle = Math.atan(dy/dx)/RAD;
+		else if(dx<0 && dy>0)//q2
+			this.angle = 180-Math.atan(dy/dx)/RAD;
+		else if(dx<0 && dy<0)//q3
+			this.angle = 180+Math.atan(dy/dx)/RAD;//TODO
+		else if(dx>0 && dy<0)//q4
+			this.angle = 360-Math.atan(dy/dx)/RAD;
+		else throw Error("("+dx+", "+dy+") not a valid coordinate point!");
+		if(isNaN(this.angle))
 			this.angle = 0;
 		this.velocity = Math.sqrt(dx*dx+dy*dy);
 		return ({x: dx, y: dy});

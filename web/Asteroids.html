@@ -27,7 +27,8 @@ function(canvas)
 		ship.y = canvas.height;
 	else if(ship.y > canvas.height)
 		ship.y = 0;
-	document.getElementById("ship.vector.angle").innerHTML = "ship angle: "+ship.vector.angle;
+	document.getElementById("ship.angle").innerHTML = "ship angle: "+ship.angle;
+	document.getElementById("ship.vector.angle").innerHTML = "ship move angle: "+ship.vector.angle;
 	document.getElementById("ship.vector.velocity").innerHTML = "ship velocity: "+ship.vector.velocity;
 });
 	gamecanvas.addGameObject(ship);
@@ -45,7 +46,10 @@ function(canvas)
 	});
 	addKeyListener(document, "S", function(key){
 		//move ship backward
-		ship.move(ship.angle, -shipacc);
+		if(ship.vector.velocity-shipacc<0)
+			ship.vector.velocity=0;
+		else
+			ship.move(ship.angle, -shipacc);
 	});
 };
 </script>
@@ -53,6 +57,7 @@ function(canvas)
 <body onload="loadgame('gamecanvas')">
 <div id="warning" class="bigred blink-step">This game is under construction</div>
 <canvas id="gamecanvas" width="200px" height="100px" style="border:1px solid #000000;"></canvas>
+<div id="ship.angle"></div>
 <div id="ship.vector.angle"></div>
 <div id="ship.vector.velocity"></div>
 </body>

@@ -35,6 +35,8 @@ function GameObject(imgsrc, initx, inity, initangle, initspd, initspin)
 		this.spin %= 360;
 		this.angle+= degrees;
 		this.angle %= 360;
+		if(this.angle<0)
+			this.angle+=360;
 	}
 	this.paint = function(context)
 	{
