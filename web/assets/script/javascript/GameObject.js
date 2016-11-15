@@ -47,4 +47,7 @@ function GameObject(imgsrc, initx, inity, initangle, initspd, initspin)
 		
 		drawGameObject(context, this);
 	}
+	this.getFrame = function(frm){
+		return this.img;
+	}
 }

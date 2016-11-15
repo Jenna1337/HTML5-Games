@@ -47,3 +47,4 @@ function GameCanvas(canvasname, funcpaint, marginside)
 		return gamemargin;
 	}
 }
+
