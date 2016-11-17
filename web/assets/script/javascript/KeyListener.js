@@ -1,17 +1,25 @@
-var keylisteners = [];
+var KEY_WILDCARD = "*";
+var listeners = [];
 function iterate(func)
 {
-		var listener;
-		for(var i=0; i<keylisteners.length; i++)
+	if(typeof(event.key)=="undefined")
+		throw new Error("event is invalid!");
+	var keytext = event.key;
+	var listener;
+	for(var i=0; i<listeners.length; i++)
+	{
+		listener=listeners[i];
+		if(listener[func])
 		{
-			listener=keylisteners[i];
-			if(listener[func])
-				if(String.fromCharCode(event.keyCode) == listener.key)
-					listener[func](listener.key);
+			if(keytext == listener.key || listener.key == KEY_WILDCARD)
+				listener[func](event);
 		}
+	}
 }
 var listenerinit = false;
 function addKeyListener(doc, key, ondown, onup, once) {
+	if(keynames.indexOf(key)<0 && key!=KEY_WILDCARD)
+		throw new Error(key + " is undefined");
 	if(!listenerinit)
 	{
 		doc.onkeydown = function(event) {
@@ -26,267 +34,5 @@ function addKeyListener(doc, key, ondown, onup, once) {
 	if(!once)
 		once=false;
 	
-	keylisteners.push({key: key, ondown: ondown, onup: onup, once: once});
-}
-function getKeyText(keyCode)
-{
-	return keynames[keyCode];
-}
-keynames = {
-	0X00: "NULL",
-	0X01: "MOUSE1",
-	0X02: "MOUSE2",
-	0X03: "BREAK",
-	0X04: "MOUSE3",
-	0X05: "MOUSE X1",
-	0X06: "MOUSE X2",
-	0X07: "UNDEFINED",
-	0X08: "BACKSPACE",
-	0X09: "TAB",
-	0X0A: "RESERVED",
-	0X0B: "RESERVED",
-	0X0C: "CLEAR",
-	0X0D: "ENTER",
-	0X0E: "UNDEFINED",
-	0X0F: "UNDEFINED",
-	0X10: "SHIFT",
-	0X11: "CTRL",
-	0X12: "ALT",
-	0X13: "PAUSE",
-	0X14: "CAPS LOCK",
-	0X15: "IME KANA|HANGUL MODE",
-	0X16: "UNDEFINED",
-	0X17: "IME JUNJA MODE",
-	0X18: "IME FINAL MODE",
-	0X19: "IME HANJA|KANJI MODE",
-	0X1A: "UNDEFINED",
-	0X1B: "ESC",
-	0X1C: "IME CONVERT",
-	0X1D: "IME NONCONVERT",
-	0X1E: "IME ACCEPT",
-	0X1F: "IME MODE CHANGE REQUEST",
-	0X20: "SPACE",
-	0X21: "PG UP",
-	0X22: "PG DN",
-	0X23: "END",
-	0X24: "HOME",
-	0X25: "LEFT ARROW",//ARROW LEFT
-	0X26: "UP ARROW",//ARROW UP
-	0X27: "RIGHT ARROW",//ARROW RIGHT
-	0X28: "DOWN ARROW",//ARROW DOWN
-	0X29: "SELECT",
-	0X2A: "PRINT",
-	0X2B: "EXECUTE",
-	0X2C: "PRT SC",
-	0X2D: "INSERT",
-	0X2E: "DELETE",
-	0X2F: "HELP",
-	0X30: "0",
-	0X31: "1",
-	0X32: "2",
-	0X33: "3",
-	0X34: "4",
-	0X35: "5",
-	0X36: "6",
-	0X37: "7",
-	0X38: "8",
-	0X39: "9",
-	0X3A: "UNDEFINED",
-	0X3B: "UNDEFINED",
-	0X3C: "UNDEFINED",
-	0X3D: "UNDEFINED",
-	0X3E: "UNDEFINED",
-	0X3F: "UNDEFINED",
-	0X40: "UNDEFINED",
-	0X41: "A",
-	0X42: "B",
-	0X43: "C",
-	0X44: "D",
-	0X45: "E",
-	0X46: "F",
-	0X47: "G",
-	0X48: "H",
-	0X49: "I",
-	0X4A: "J",
-	0X4B: "K",
-	0X4C: "L",
-	0X4D: "M",
-	0X4E: "N",
-	0X4F: "O",
-	0X50: "P",
-	0X51: "Q",
-	0X52: "R",
-	0X53: "S",
-	0X54: "T",
-	0X55: "U",
-	0X56: "V",
-	0X57: "W",
-	0X58: "X",
-	0X59: "Y",
-	0X5A: "Z",
-	0X5B: "LEFT OS",
-	0X5C: "RIGHT OS",
-	0X5D: "CONTEXT MENU",
-	0X5E: "RESERVED",
-	0X5F: "SLEEP",
-	0X60: "NUM 0",
-	0X61: "NUM 1",
-	0X62: "NUM 2",
-	0X63: "NUM 3",
-	0X64: "NUM 4",
-	0X65: "NUM 5",
-	0X66: "NUM 6",
-	0X67: "NUM 7",
-	0X68: "NUM 8",
-	0X69: "NUM 9",
-	0X6A: "NUM *",
-	0X6B: "NUM +",
-	0X6C: "NUM ,",
-	0X6D: "NUM -",
-	0X6E: "NUM .",
-	0X6F: "NUM /",
-	0X70: "F1",
-	0X71: "F2",
-	0X72: "F3",
-	0X73: "F4",
-	0X74: "F5",
-	0X75: "F6",
-	0X76: "F7",
-	0X77: "F8",
-	0X78: "F9",
-	0X79: "F10",
-	0X7A: "F11",
-	0X7B: "F12",
-	0X7C: "F13",
-	0X7D: "F14",
-	0X7E: "F15",
-	0X7F: "F16",
-	0X80: "F17",
-	0X81: "F18",
-	0X82: "F19",
-	0X83: "F20",
-	0X84: "F21",
-	0X85: "F22",
-	0X86: "F23",
-	0X87: "F24",
-	0X88: "UNASSIGNED",
-	0X89: "UNASSIGNED",
-	0X8A: "UNASSIGNED",
-	0X8B: "UNASSIGNED",
-	0X8C: "UNASSIGNED",
-	0X8D: "UNASSIGNED",
-	0X8E: "UNASSIGNED",
-	0X8F: "UNASSIGNED",
-	0X90: "NUM LOCK",
-	0X91: "SCROLL",
-	0X92: "OEM SPECIFIC",
-	0X93: "OEM SPECIFIC",
-	0X94: "OEM SPECIFIC",
-	0X95: "OEM SPECIFIC",
-	0X96: "OEM SPECIFIC",
-	0X97: "UNASSIGNED",
-	0X98: "UNASSIGNED",
-	0X99: "UNASSIGNED",
-	0X9A: "UNASSIGNED",
-	0X9B: "UNASSIGNED",
-	0X9C: "UNASSIGNED",
-	0X9D: "UNASSIGNED",
-	0X9E: "UNASSIGNED",
-	0X9F: "UNASSIGNED",
-	0XA0: "LEFT SHIFT",
-	0XA1: "RIGHT SHIFT",
-	0XA2: "LEFT CTRL",
-	0XA3: "RIGHT CTRL",
-	0XA4: "LEFT MENU",
-	0XA5: "RIGHT MENU",
-	0XA6: "BROWSER BACK",
-	0XA7: "BROWSER FORWARD",
-	0XA8: "BROWSER REFRESH",
-	0XA9: "BROWSER STOP",
-	0XAA: "BROWSER SEARCH",
-	0XAB: "BROWSER FAVORITES",
-	0XAC: "BROWSER START/HOME KEY",
-	0XAD: "VOLUME MUTE",
-	0XAE: "VOLUME DOWN",
-	0XAF: "VOLUME UP",
-	0XB0: "NEXT TRACK",
-	0XB1: "PREV TRACK",
-	0XB2: "STOP MEDIA",
-	0XB3: "PLAY/PAUSE MEDIA",
-	0XB4: "START MAIL",
-	0XB5: "SELECT MEDIA",
-	0XB6: "START APP 1",
-	0XB7: "START APP 2",
-	0XB8: "RESERVED",
-	0XB9: "RESERVED",
-	0XBA: ";",//OEM_1 //CAN VARY
-	0XBB: "=",
-	0XBC: ",",
-	0XBD: "-",
-	0XBE: ".",
-	0XBF: "/",//OEM_2 //CAN VARY
-	0XC0: "`",//OEM_3 //CAN VARY
-	0XC1: "RESERVED",
-	0XC2: "RESERVED",
-	0XC3: "RESERVED",
-	0XC4: "RESERVED",
-	0XC5: "RESERVED",
-	0XC6: "RESERVED",
-	0XC7: "RESERVED",
-	0XC8: "RESERVED",
-	0XC9: "RESERVED",
-	0XCA: "RESERVED",
-	0XCB: "RESERVED",
-	0XCC: "RESERVED",
-	0XCD: "RESERVED",
-	0XCE: "RESERVED",
-	0XCF: "RESERVED",
-	0XD0: "RESERVED",
-	0XD1: "RESERVED",
-	0XD2: "RESERVED",
-	0XD3: "RESERVED",
-	0XD4: "RESERVED",
-	0XD5: "RESERVED",
-	0XD6: "RESERVED",
-	0XD7: "RESERVED",
-	0XD8: "UNASSIGNED",
-	0XD9: "UNASSIGNED",
-	0XDA: "UNASSIGNED",
-	0XDB: "[",//OEM_4 //CAN VARY
-	0XDC: "\\",//OEM_5 //CAN VARY
-	0XDD: "]",//OEM_6 //CAN VARY
-	0XDE: "'",//OEM_7 //CAN VARY
-	0XDF: "",//OEM_8 //CAN VARY
-	0XE0: "RESERVED",
-	0XE1: "OEM SPECIFIC",
-	0XE2: "OEM SPECIFIC",
-	0XE3: "OEM SPECIFIC",
-	0XE4: "OEM SPECIFIC",
-	0XE5: "IME PROCESS",
-	0XE6: "OEM SPECIFIC",
-	0XE7: "PACKET",
-	0XE8: "UNASSIGNED",
-	0XE9: "OEM SPECIFIC",
-	0XEA: "OEM SPECIFIC",
-	0XEB: "OEM SPECIFIC",
-	0XEC: "OEM SPECIFIC",
-	0XED: "OEM SPECIFIC",
-	0XEE: "OEM SPECIFIC",
-	0XEF: "OEM SPECIFIC",
-	0XF0: "OEM SPECIFIC",
-	0XF1: "OEM SPECIFIC",
-	0XF2: "OEM SPECIFIC",
-	0XF3: "OEM SPECIFIC",
-	0XF4: "OEM SPECIFIC",
-	0XF5: "OEM SPECIFIC",
-	0XF6: "ATTN",
-	0XF7: "CRSEL",
-	0XF8: "EXSEL",
-	0XF9: "EREOF",//ERASE EOF
-	0XFA: "PLAY",
-	0XFB: "ZOOM",
-	0XFC: "RESERVED",
-	0XFD: "PA1",
-	0XFE: "CLEAR",
-	0XFF: "UNDEFINED"
+	listeners.push({key: key, ondown: ondown, onup: onup, once: once});
 }

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<head>
+<script src="assets/script/javascript/keys.js"></script>
+<script src="assets/script/javascript/locations.js"></script>
+<script src="assets/script/javascript/KeyListener.js"></script>
+<script>
+function onload(){
+	addKeyListener(document, KEY_WILDCARD, function(event){
+		document.getElementById("keydown").innerHTML = 
+				locations[event.location] + " " + event.key;
+	}, function(key){
+		document.getElementById("keyup").innerHTML =
+				locations[event.location] + " " + event.key;
+	});
+};
+</script>
+</head>
+<body onload="onload();">
+<table>
+	<tr>
+		<td style="text-align: right;">keydown:</td>
+		<td id="keydown">Unidentified</td>
+	</tr>
+	<tr>
+		<td style="text-align: right;">keyup:  </td>
+		<td id="keyup"  >Unidentified</td>
+	</tr>
+</table>
+</body>
