@@ -1,0 +1,148 @@
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Collision Test</title>
+		<style>
+			svg {
+				border: 1px solid black;
+			}
+			svg * {
+				fill: red;
+			}
+			.collision-state{
+				fill: blue !important;
+			}
+			.wall{
+				fill: green !important;
+			}
+			.boundry{
+				fill: darkgreen !important;
+			}
+		</style>
+	</head>
+	<body>
+		<svg id="gameArea" height="300px" width="500px"></svg>
+	</body>
+	<script>
+/* */
+
+function addGameObjectRect(type,shapeX,shapeY,shapeWidth,shapeHeight,collidable=true) {
+	var shape = new GameObject(type,shapeX,shapeY,shapeHeight,shapeWidth,collidable);
+	return shape;
+}
+
+
+
+const stdTypes = {
+	'player':0,
+	'wall':1,
+	'boundry':2,
+};
+const svgns = "http://www.w3.org/2000/svg";
+var gameArea = document.getElementById("gameArea");
+var gameObjects = [];
+
+class GameObject{
+	constructor(type,startX,startY,startHeight,startWidth,collidable){
+		this.position={"y":startY,"x":startX,"height":startHeight,"width":startWidth};
+		this.ref = document.createElementNS(svgns, 'rect');
+		(this.type = type.split(' ')).forEach(t=>{
+			this.ref.classList.add(t);
+		})
+		this.collidable = collidable;
+		this.collisionHandlers = {};
+		gameObjects.push(this);
+		gameArea.appendChild(this.ref);
+		this.redraw();
+	}
+	shiftPosition (x, y) {
+		this.position.x += x;
+		this.position.y += y;
+		//this.ref.setAttribute('style', `x: ${this.position.x}px; y: ${this.position.y}px`);
+		var overlapList = window.ool=this.getCollisions(), undone=false;
+		for(var ovObj of overlapList){
+			if(ovObj.collidable && !undone){
+				undone=true;
+				this.position.x -=x;
+				this.position.y -=y;
+			}
+		}
+		this.redraw();
+	}
+	redraw(){
+			for(var attr in this.position)
+				this.ref.setAttributeNS(null,attr, this.position[attr]);
+			//this.ref.setAttribute('path', `M ${this.position.x} ${this.position.y} l ${this.w} 0 0 ${this.h} ${this.w} ${this.h} 0 0 z`);
+	}
+	addCollisionHandler(targetType,callback){
+		
+	}
+	getCollisions() {
+		var list = [];
+		for(var gameObj of gameObjects) {
+			if(gameObj==null || (typeof gameObj)!="object" || this===gameObj)
+				continue;
+			if (gameObj.position.x < this.position.x + this.position.width &&
+					gameObj.position.x + gameObj.position.width > this.position.x &&
+					gameObj.position.y < this.position.y + this.position.height &&
+					gameObj.position.height + gameObj.position.y > this.position.y) {
+				list.push(gameObj);
+			}
+		}
+		return list;
+	}
+}
+
+var keybinds=[];
+function addKeyBind(key, callback){
+	keybinds.push({"key":key,"callback":callback});
+}
+function keyDownHandler(e){
+	if(!document.hasFocus)
+		return;
+	for(var bind of keybinds)
+		if(e.which==bind.key)
+			bind.active=true;
+}
+function keyUpHandler(e){
+	for(var bind of keybinds)
+		if(e.which==bind.key)
+			bind.active=false;
+}
+window.addEventListener("keydown", keyDownHandler, false);
+window.addEventListener("keyup", keyUpHandler, false);
+
+var boundryWallThickness = 5;
+var h=gameArea.height.baseVal.value,
+	w=gameArea.width.baseVal.value,
+	t=boundryWallThickness;
+
+player=addGameObjectRect('player',20,20,20,20,true)
+addGameObjectRect('wall',50,80,10,60,true)
+addGameObjectRect('wall',80,80,10,40,true)
+addGameObjectRect('wall',80,80,40,10,true)
+addGameObjectRect('wall',80,50,40,10,true)
+addGameObjectRect('wall',40,40,20,20,true)
+
+addGameObjectRect('wall boundry',0  ,0  ,w,t,true)//upper wall
+addGameObjectRect('wall boundry',0  ,h-t,w,t,true)//lower wall
+addGameObjectRect('wall boundry',0  ,0  ,t,h,true)//left wall
+addGameObjectRect('wall boundry',w-t,0  ,t,h,true)//right wall
+
+var moveSpeed = 2;
+addKeyBind(37, (e)=>player.shiftPosition(-moveSpeed, 0));
+addKeyBind(38, (e)=>player.shiftPosition(0, -moveSpeed));
+addKeyBind(39, (e)=>player.shiftPosition(moveSpeed, 0));
+addKeyBind(40, (e)=>player.shiftPosition(0, moveSpeed));
+
+function handleBindings(){
+	for(var bind of keybinds)
+		if(bind.active)
+			bind.callback();
+}
+
+setInterval(handleBindings, 10);
+
+
+	</script>
+</body>
