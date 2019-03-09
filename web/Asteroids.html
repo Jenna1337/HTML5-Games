@@ -1,51 +1,59 @@
 <!DOCTYPE html>
 <head>
+<meta charset="UTF-8">
 <link rel="stylesheet" href="assets/styles/Common.css">
-<script src="assets/script/javascript/keys.js"></script>
-<script src="assets/script/javascript/KeyListener.js"></script>
+<script src="assets/script/javascript/KeyBinds.js"></script>
 <script src="assets/script/javascript/CanvasTools.js"></script>
 <script src="assets/script/javascript/Vector.js"></script>
 <script src="assets/script/javascript/GameObject.js"></script>
 <script src="assets/script/javascript/GameCanvas.js"></script>
+</head>
+<body>
+<!--div id="warning" class="bigred blink-step">This game is under construction</div-->
+<canvas id="gamecanvas" width="200px" height="100px" style="border:1px solid #000000;"></canvas>
+<div id="ship.angle"></div>
+<div id="ship.vector.angle"></div>
+<div id="ship.vector.velocity"></div>
+</body>
 <script>
 ship = new GameObject("assets/img/ship.png", 20, 40, 60, 0.1, 0.0);
-var deltamax = 2.5;
+var deltamax = 1.5;
 var shipacc = 0.1;
 var shipmax = 0.5;
 var gamecanvas;
 function loadgame(cname){
 	gamecanvas = new GameCanvas(cname, 
-function(canvas)
-{
-	ship.spin = Math.min(Math.max(-deltamax, ship.spin), deltamax);
-	if(ship.vector.velocity > shipmax)
-		ship.vector.velocity = shipmax;
-	if(ship.x < 0)
-		ship.x = canvas.width;
-	else if(ship.x > canvas.width)
-		ship.x = 0;
-	if(ship.y < 0)
-		ship.y = canvas.height;
-	else if(ship.y > canvas.height)
-		ship.y = 0;
-	document.getElementById("ship.angle").innerHTML = "ship angle: "+ship.angle;
-	document.getElementById("ship.vector.angle").innerHTML = "ship move angle: "+ship.vector.angle;
-	document.getElementById("ship.vector.velocity").innerHTML = "ship velocity: "+ship.vector.velocity;
-});
+			function(canvas){
+				ship.spin = Math.min(Math.max(-deltamax, ship.spin), deltamax);
+				if(ship.vector.velocity > shipmax)
+					ship.vector.velocity = shipmax;
+				if(ship.x < 0)
+					ship.x = canvas.width;
+				else if(ship.x > canvas.width)
+					ship.x = 0;
+				if(ship.y < 0)
+					ship.y = canvas.height;
+				else if(ship.y > canvas.height)
+					ship.y = 0;
+				document.getElementById("ship.angle").innerHTML = "ship angle: "+ship.angle;
+				document.getElementById("ship.vector.angle").innerHTML = "ship move angle: "+ship.vector.angle;
+				document.getElementById("ship.vector.velocity").innerHTML = "ship velocity: "+ship.vector.velocity;
+				handleBindings();
+			});
 	gamecanvas.addGameObject(ship);
-	addKeyListener(document, "A", function(key){
+	addKeyBind(KeyEvent.DOM_VK_LEFT, function(key){
 		//turn ship left
-		ship.turn(-1);
+		ship.turn(-0.1);
 	});
-	addKeyListener(document, "D", function(key){
+	addKeyBind(KeyEvent.DOM_VK_RIGHT, function(key){
 		//turn ship right
-		ship.turn(1);
+		ship.turn(0.1);
 	});
-	addKeyListener(document, "W", function(key){
+	addKeyBind(KeyEvent.DOM_VK_UP, function(key){
 		//move ship forward
 		ship.move(ship.angle, shipacc);
 	});
-	addKeyListener(document, "S", function(key){
+	addKeyBind(KeyEvent.DOM_VK_DOWN, function(key){
 		//move ship backward
 		if(ship.vector.velocity-shipacc<0)
 			ship.vector.velocity=0;
@@ -53,12 +61,6 @@ function(canvas)
 			ship.move(ship.angle, -shipacc);
 	});
 };
+loadgame('gamecanvas');
 </script>
-</head>
-<body onload="loadgame('gamecanvas')">
-<div id="warning" class="bigred blink-step">This game is under construction</div>
-<canvas id="gamecanvas" width="200px" height="100px" style="border:1px solid #000000;"></canvas>
-<div id="ship.angle"></div>
-<div id="ship.vector.angle"></div>
-<div id="ship.vector.velocity"></div>
-</body>
+</html>

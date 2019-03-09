@@ -1,23 +1,19 @@
-var KEY_WILDCARD = "*";
+const KEY_WILDCARD = "*";
+const KEY_UNKNOWN = "?";
 var listeners = [];
-function iterate(func)
+function iterate(func, event)
 {
 	var keytext;
 	if(typeof(event.keyCode)!="undefined")
 		keytext = getKeyText(event.keyCode);
-	if(typeof(event.button)!="undefined")
-	{
-		keytext = getKeyText(event.button+1);
-	}
+	if(typeof(event.button)!="undefined"){console.log(event)
+	keytext = getMouseText(event.button);}
 	var listener;
-	for(var i=0; i<listeners.length; i++)
-	{
+	for(var i=0; i<listeners.length; i++){
 		listener=listeners[i];
 		if(listener[func])
-		{
 			if(keytext == listener.key || listener.key == KEY_WILDCARD)
 				listener[func](keytext);
-		}
 	}
 }
 var listenerinit = false;
@@ -27,16 +23,16 @@ function addInputListener(doc, key, ondown, onup, once) {
 	if(!listenerinit)
 	{
 		doc.onmousedown = function(event) {
-			iterate("ondown");
+			iterate("ondown", event);
 		}
 		doc.onmouseup = function(event){
-			iterate("onup");
+			iterate("onup", event);
 		}
 		doc.onkeydown = function(event) {
-			iterate("ondown");
+			iterate("ondown", event);
 		}
 		doc.onkeyup = function(event){
-			iterate("onup");
+			iterate("onup", event);
 		}
 	}
 	if(!onup)
@@ -46,19 +42,29 @@ function addInputListener(doc, key, ondown, onup, once) {
 	
 	listeners.push({key: key, ondown: ondown, onup: onup, once: once});
 }
+function getMouseText(buttonId){
+	switch(buttonId){
+		case 0: vkcode = 1; break;
+		case 1: vkcode = 4; break;
+		case 2: vkcode = 2; break;
+	}
+	return getKeyText(vkcode);
+}
 function getKeyText(keyCode)
 {
 	var return_value = keynames[keyCode];
-	if(typeof(return_value) == "undefined")
-		return ""+keyCode;
+	if(typeof(return_value) == "undefined"){
+		console.warn("Unknown virtual key code: "+keyCode);
+		return KEY_UNKNOWN+keyCode+KEY_UNKNOWN;
+	}
 	return return_value;
 }
 keynames = [
 	"NULL",
-	"MOUSE1",
-	"MOUSE2",
+	"MOUSE LEFT",
+	"MOUSE RIGHT",
 	"BREAK",
-	"MOUSE3",
+	"MOUSE MIDDLE",
 	"MOUSE X1",
 	"MOUSE X2",
 	"UNDEFINED",

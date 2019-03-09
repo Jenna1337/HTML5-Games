@@ -374,7 +374,7 @@ keynames = [
 ];
 var KEY_WILDCARD = "*";
 var listeners = [];
-function iterate(func)
+function iterate(func, event)
 {
 	if(typeof(event.key)=="undefined")
 		throw new Error("event is invalid!");
@@ -397,10 +397,10 @@ function addKeyListener(doc, key, ondown, onup, once) {
 	if(!listenerinit)
 	{
 		doc.onkeydown = function(event) {
-			iterate("ondown");
+			iterate("ondown", event);
 		}
 		doc.onkeyup = function(event){
-			iterate("onup");
+			iterate("onup", event);
 		}
 		listenerinit = true;
 	}

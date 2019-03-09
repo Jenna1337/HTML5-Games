@@ -4,19 +4,19 @@
 <script>
 function onload(){
 	addInputListener(document, "MOUSE1", function(key){
-		document.getElementById("keydown").innerHTML = keynames.indexOf(key) + " = " + getKeyText(key);
+		document.getElementById("keydown").innerHTML = keynames.indexOf(key) + " = " + key;
 	}, function(key){
-		document.getElementById("keyup").innerHTML = keynames.indexOf(key) + " = " + getKeyText(key);
+		document.getElementById("keyup").innerHTML = keynames.indexOf(key) + " = " + key;
 	});
 	addInputListener(document, KEY_WILDCARD, function(key){
-		document.getElementById("keydown").innerHTML = keynames.indexOf(key) + " = " + getKeyText(key);
+		document.getElementById("keydown").innerHTML = keynames.indexOf(key) + " = " + key;
 	}, function(key){
-		document.getElementById("keyup").innerHTML = keynames.indexOf(key) + " = " + getKeyText(key);
+		document.getElementById("keyup").innerHTML = keynames.indexOf(key) + " = " + key;
 	});
 	addInputListener(document, "A", function(key){
-		document.getElementById("keydown").innerHTML = keynames.indexOf(key) + " = " + getKeyText(key);
+		document.getElementById("keydown").innerHTML = keynames.indexOf(key) + " = " + key;
 	}, function(key){
-		document.getElementById("keyup").innerHTML = keynames.indexOf(key) + " = " + getKeyText(key);
+		document.getElementById("keyup").innerHTML = keynames.indexOf(key) + " = " + key;
 	});
 };
 </script>

@@ -8,7 +8,7 @@ function onload(){
 	addKeyListener(document, KEY_WILDCARD, function(event){
 		document.getElementById("keydown").innerHTML = 
 				locations[event.location] + " " + event.key;
-	}, function(key){
+	}, function(event){
 		document.getElementById("keyup").innerHTML =
 				locations[event.location] + " " + event.key;
 	});

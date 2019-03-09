@@ -26,9 +26,9 @@ function GameObject(imgsrc, initx, inity, initangle, initspd, initspin)
 		this.deltax = coords.x;
 		this.deltay = coords.y;
 	};
-	try{
+	//try{
 		this.move(initangle, initspd);
-	}catch(e){}
+	//}catch(e){}
 	this.turn = function(degrees)
 	{
 		this.spin += degrees;

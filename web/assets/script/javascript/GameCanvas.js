@@ -1,50 +1,36 @@
 
-function GameCanvas(canvasname, funcpaint, marginside)
-{
-	if(typeof(funcpaint)=="undefined" || funcpaint==null)
-		throw new Error("funcpaint is invalid!");
-	if(typeof(canvasname)=="undefined" || canvasname==null)
-		throw new Error("Element id=\""+canvasname+"\" was not found.");
-	var canvasname = canvasname;
-	var gameObjects = null;
-	var gamespeed = 1;
-	var marginside = marginside ? marginside : 0;
-	var gamemargin;
-	this.paint = function(){
-		var canvas = document.getElementById(canvasname);
-		gamemargin = ({left: marginside, right: canvas.width-marginside});
+class GameCanvas{
+	constructor(canvasname, funcpaint){
+		if(typeof(funcpaint)=="undefined" || funcpaint==null)
+			throw new Error("funcpaint is invalid!");
+		if(typeof(canvasname)=="undefined" || canvasname==null)
+			throw new Error("Element id=\""+canvasname+"\" was not found.");
+		this.canvas = document.getElementById(canvasname);
+		if(typeof(this.canvas)=="undefined" || this.canvas==null)
+			throw new Error("Element id=\""+canvasname+"\" was not found.");
+		this.ctx = this.canvas.getContext("2d");
+		this.gameObjects = [];
+		this.gamespeed = 10;
+		this.canvasname = canvasname;
+		this.funcpaint=funcpaint;
+		var t = this;
+		setTimeout(()=>t.paint(), this.gamespeed);
+	}
+	paint(){
 		try{
-			funcpaint(canvas);
+			this.funcpaint(this.canvas);
 		}catch(e){}
-		if(typeof(gameObjects)!="undefined" && gameObjects!=null
-			&& typeof(canvas)!="undefined" && canvas!=null)
-		{
-			var ctx = canvas.getContext("2d");
-			ctx.beginPath();
-			ctx.rect(0, 0, ctx.width, ctx.height);
-			canvas.fillStyle = "blue";
-			ctx.fill();
-			for(var i=0; i<gameObjects.length; ++i)
-				gameObjects[i].paint(ctx);
+		//if(typeof(this.ctx)=="undefined" || this.ctx==null)
+		//	return;
+		this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height)
+		for(var i=0; i<this.gameObjects.length; ++i){
+			this.gameObjects[i].paint(this.ctx);
 		}
-		if(this.paint)
-			setTimeout(this.paint, gamespeed);
-		else if(arguments.callee)
-			setTimeout(arguments.callee, gamespeed);
-		else
-			throw new Error("paint is undefined!");
-	};
-	this.addGameObject = function(gameobj)
-	{
-		if(typeof(gameObjects)!="undefined" && gameObjects!=null)
-			gameObjects.push(gameobj);
-		else
-			gameObjects = [gameobj];
-	};
-	this.paint();
-	this.getMargins = function()
-	{
-		return gamemargin;
+		var t = this;
+		setTimeout(()=>t.paint(), this.gamespeed);
+	}
+	addGameObject(gameobj){
+		this.gameObjects.push(gameobj);
 	}
 }
 
