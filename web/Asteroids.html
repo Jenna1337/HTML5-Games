@@ -10,16 +10,15 @@
 </head>
 <body>
 <!--div id="warning" class="bigred blink-step">This game is under construction</div-->
-<canvas id="gamecanvas" width="200px" height="100px" style="border:1px solid #000000;"></canvas>
-<div id="ship.angle"></div>
-<div id="ship.vector.angle"></div>
+<canvas id="gamecanvas" width="200px" height="200px" style="border:1px solid #000000;"></canvas>
 <div id="ship.vector.velocity"></div>
 </body>
 <script>
 ship = new GameObject("assets/img/ship.png", 20, 40, 60, 0.1, 0.0);
 var deltamax = 1.5;
-var shipacc = 0.1;
+var shipacc = 0.05;
 var shipmax = 0.5;
+var shipturnspeed = 0.1;
 var gamecanvas;
 function loadgame(cname){
 	gamecanvas = new GameCanvas(cname, 
@@ -35,19 +34,17 @@ function loadgame(cname){
 					ship.y = canvas.height;
 				else if(ship.y > canvas.height)
 					ship.y = 0;
-				document.getElementById("ship.angle").innerHTML = "ship angle: "+ship.angle;
-				document.getElementById("ship.vector.angle").innerHTML = "ship move angle: "+ship.vector.angle;
-				document.getElementById("ship.vector.velocity").innerHTML = "ship velocity: "+ship.vector.velocity;
+				document.getElementById("ship.vector.velocity").textContent = "ship velocity: "+ship.vector.velocity;
 				handleBindings();
 			});
 	gamecanvas.addGameObject(ship);
 	addKeyBind(KeyEvent.DOM_VK_LEFT, function(key){
 		//turn ship left
-		ship.turn(-0.1);
+		ship.turn(-shipturnspeed);
 	});
 	addKeyBind(KeyEvent.DOM_VK_RIGHT, function(key){
 		//turn ship right
-		ship.turn(0.1);
+		ship.turn(shipturnspeed);
 	});
 	addKeyBind(KeyEvent.DOM_VK_UP, function(key){
 		//move ship forward
@@ -55,10 +52,7 @@ function loadgame(cname){
 	});
 	addKeyBind(KeyEvent.DOM_VK_DOWN, function(key){
 		//move ship backward
-		if(ship.vector.velocity-shipacc<0)
-			ship.vector.velocity=0;
-		else
-			ship.move(ship.angle, -shipacc);
+		ship.move(ship.angle, -shipacc);
 	});
 };
 loadgame('gamecanvas');
