@@ -1,34 +1,24 @@
 var RAD = Math.PI/180;
-function Vector(angle, velocity)
+class Vector
 {
-	this.angle = angle;
-	this.velocity = velocity;
-	this.addVector = function(vector){
+	constructor(angle, velocity){
+		this.angle = angle;
+		this.velocity = velocity;
+	}
+	addVector(vector){
 		if(vector != null && vector.type == Vector){
 			this.translate(vector.angle, vector.velocity);
 		}
 	};
-	this.getCoords = function(){
+	getCoords(){
 		
 		var x = Math.cos(this.angle)*this.velocity;
 		var y = Math.sin(this.angle)*this.velocity;
 		
 		return ({x: x, y: y});
 	}
-	this.translate = function(angle, velocity)
+	translate(angle, velocity)
 	{
-		//cos = a/h
-		//sin = o/h
-		//
-		//       a2
-		//        /|
-		//     h2/ | o2
-		//      /__|
-		//     /|
-		//  h1/ | o1
-		//   /__| 
-		//    a1
-		//
 		var c1 = new Vector(RAD*this.angle, this.velocity).getCoords();
 		var c2 = new Vector(RAD*angle, velocity).getCoords();
 		var dx = c1.x + c2.x;

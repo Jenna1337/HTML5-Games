@@ -1,0 +1,21 @@
+
+TODO list:
+
+
+
+Fix pages that depended on the old GameObject file.
+
+
+
+
+
+
+Delete the following files and fix the pages that depend on them:
+
+KeyListener.js
+locations.js
+GameObject(Old20190312).js
+InputListener.js
+InputListener2.js
+
+
