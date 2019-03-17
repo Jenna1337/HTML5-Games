@@ -40,7 +40,7 @@ var setKeyBind = function(key, callback, id=keybinds.length){
 		keybinds[id]={"key":key,"callback":callback};
 };
 function handleBindings(){
-for(var bind of keybinds)
-	if(bind.active)
-		bind.callback();
+	for(var bind of keybinds)
+		if(bind.active)
+			bind.callback(bind);
 }

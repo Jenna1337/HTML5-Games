@@ -1,16 +1,13 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
-		<title>Collision Test</title>
+		<title>Collision Test Canvas</title>
 		<style>
 			canvas {
 				border: 1px solid black;
 			}
 		</style>
 		<script src="assets/script/javascript/KeyBinds.js"></script>
-		<script src="assets/script/javascript/CanvasTools.js"></script>
-		<script src="assets/script/javascript/Vector.js"></script>
-		<script src="assets/script/javascript/GameObject.js"></script>
 		<script src="assets/script/javascript/GameCanvas.js"></script>
 	</head>
 	<body>
@@ -18,6 +15,7 @@
 	</body>
 	<script>
 /* */
+window.addEventListener('load', ()=>{
 
 function addGameObjectRect(obj) {
 	var gamobj = new GameObject(obj);
@@ -39,6 +37,7 @@ const typestyles = {
 };
 var gamecanvas = new GameCanvas("gameArea");
 var gameArea = gamecanvas.canvas;
+window.gamecanvas = gamecanvas
 gamecanvas.addTypeStyles(typestyles)
 
 
@@ -77,6 +76,6 @@ addKeyBind("A", (e)=>player2.shiftPosition(-moveSpeed, 0));
 addKeyBind("W", (e)=>player2.shiftPosition(0, -moveSpeed));
 addKeyBind("D", (e)=>player2.shiftPosition(moveSpeed, 0));
 addKeyBind("S", (e)=>player2.shiftPosition(0, moveSpeed));
-
+});
 	</script>
 </body>

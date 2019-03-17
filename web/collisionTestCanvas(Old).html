@@ -1,0 +1,173 @@
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Collision Test</title>
+		<style>
+			canvas {
+				border: 1px solid black;
+			}
+			.collision-state{
+				fill: blue !important;
+			}
+			.wall{
+				fill: green !important;
+			}
+			.boundry{
+				fill: darkgreen !important;
+			}
+		</style>
+		<script src="assets/script/javascript/KeyBinds.js"></script>
+
+	</head>
+	<body>
+		<canvas id="gameArea" height="300px" width="500px"></canvas>
+	</body>
+	<script>
+/* */
+
+function addGameObjectRect(type,shapeX,shapeY,shapeWidth,shapeHeight,collidable=true) {
+	var shape = new GameObject(type,shapeX,shapeY,shapeHeight,shapeWidth,collidable);
+	return shape;
+}
+
+
+class TypeStyle{
+	constructor(fillStyle, lineWidth='0', strokeStyle='rgba(0,0,0,0)'){
+		this.fillStyle = fillStyle;
+		this.strokeStyle = strokeStyle;
+		this.lineWidth = lineWidth;
+	}
+}
+const typestyles = {
+	'player':new TypeStyle('blue'),
+	'wall':new TypeStyle('green'),
+	'boundry':new TypeStyle('darkgreen'),
+};
+var gameArea = document.getElementById("gameArea");
+var ctx = gameArea.getContext("2d");
+var gameObjects = [];
+
+class GameObject{
+	/*constructor(obj){
+		this.y = obj.y;
+		this.x = obj.x;
+		this.height = obj.height;
+		this.width = obj.width;
+		this.type = obj.type.split(' ');
+		this.collidable = obj.hasCollision;
+		this.collisionHandlers = {};
+		gameObjects.push(this);
+		this.redraw();
+	}*/
+	constructor(type,startX,startY,startWidth,startHeight,collidable){
+		
+		this.y = startY;
+		this.x = startX;
+		this.height = startHeight;
+		this.width = startWidth;
+		this.type = type.split(' ');
+		this.collidable = collidable;
+		this.collisionHandlers = {};
+		gameObjects.push(this);
+		this.redraw();
+	}
+	shiftPosition (x, y) {
+		this.x += x;
+		this.y += y;
+		//this.ref.setAttribute('style', `x: ${this.x}px; y: ${this.y}px`);
+		var overlapList = window.ool=this.getCollisions(), undone=false;
+		for(var ovObj of overlapList){
+			if(ovObj.collidable && !undone){
+				undone=true;
+				this.x -=x;
+				this.y -=y;
+			}
+		}
+	}
+	redraw(){
+		for(var i in this.type){
+			var typestyle = typestyles[this.type[i]];
+			if(typestyle){
+				for(var attr in typestyle){
+					ctx[attr] = typestyle[attr];
+				}
+			}
+		}
+		ctx.fillRect(this.x, this.y, this.width, this.height);
+		ctx.strokeRect(this.x, this.y, this.width, this.height);
+	}
+	addCollisionHandler(targetType,callback){
+		
+	}
+	getCollisions() {
+		var list = [];
+		for(var gameObj of gameObjects) {
+			if(gameObj==null || (typeof gameObj)!="object" || this===gameObj)
+				continue;
+			if (gameObj.x < this.x + this.width &&
+					gameObj.x + gameObj.width > this.x &&
+					gameObj.y < this.y + this.height &&
+					gameObj.height + gameObj.y > this.y) {
+				list.push(gameObj);
+			}
+		}
+		return list;
+	}
+}
+function redrawAll(){
+	ctx.clearRect(0, 0, gameArea.width, gameArea.height);
+	for(var i in gameObjects)
+		gameObjects[i].redraw();
+}
+
+var boundryWallThickness = 5;
+var h=gameArea.height,
+	w=gameArea.width,
+	t=boundryWallThickness;
+
+
+player=new GameObject('player',20,20,20,20,true)
+player2=new GameObject('player',90,90,20,20,true)
+new GameObject('wall',50,80,10,60,true)
+new GameObject('wall',80,80,10,40,true)
+new GameObject('wall',80,80,40,10,true)
+new GameObject('wall',80,50,40,10,true)
+new GameObject('wall',40,40,20,20,true)
+
+
+new GameObject('wall boundry',0  ,0  ,w,t,true)//upper wall
+new GameObject('wall boundry',0  ,h-t,w,t,true)//lower wall
+new GameObject('wall boundry',0  ,0  ,t,h,true)//left wall
+new GameObject('wall boundry',w-t,0  ,t,h,true)//right wall
+
+var moveSpeed = 2;
+addKeyBind("ArrowLeft", (e)=>player.shiftPosition(-moveSpeed, 0));
+addKeyBind("ArrowUp", (e)=>player.shiftPosition(0, -moveSpeed));
+addKeyBind("ArrowRight", (e)=>player.shiftPosition(moveSpeed, 0));
+addKeyBind("ArrowDown", (e)=>player.shiftPosition(0, moveSpeed));
+
+addKeyBind("A", (e)=>player2.shiftPosition(-moveSpeed, 0));
+addKeyBind("W", (e)=>player2.shiftPosition(0, -moveSpeed));
+addKeyBind("D", (e)=>player2.shiftPosition(moveSpeed, 0));
+addKeyBind("S", (e)=>player2.shiftPosition(0, moveSpeed));
+
+const animationMethod = window.requestAnimationFrame ? window.requestAnimationFrame : window.setTimeout;
+var lastupdate = 0;
+function handleBindings(timestamp=0){
+	if(timestamp-1000/60>=lastupdate){
+		lastupdate = timestamp;
+		for(var bind of keybinds)
+			if(bind.active)
+				bind.callback();
+		redrawAll();
+	}
+	animationMethod(handleBindings, 10);
+	//window.setTimeout(handleBindings, 10)
+	//window.requestAnimationFrame(handleBindings)
+}
+handleBindings();
+//setInterval(handleBindings, 10);
+
+
+	</script>
+</body>

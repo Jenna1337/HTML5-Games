@@ -3,9 +3,6 @@
 <meta charset="UTF-8">
 <link rel="stylesheet" href="assets/styles/Common.css">
 <script src="assets/script/javascript/KeyBinds.js"></script>
-<script src="assets/script/javascript/CanvasTools.js"></script>
-<script src="assets/script/javascript/Vector.js"></script>
-<script src="assets/script/javascript/GameObject.js"></script>
 <script src="assets/script/javascript/GameCanvas.js"></script>
 </head>
 <body>
@@ -14,7 +11,7 @@
 <div id="ship.vector.velocity"></div>
 </body>
 <script>
-
+window.addEventListener('load', ()=>{
 var deltamax = 2;
 var shipacc = 0.05;
 var shipmax = 1;
@@ -46,10 +43,7 @@ addKeyBind(["W", "ArrowUp"], function(key){
 	//move ship forward
 	ship.move(ship.angle, shipacc);
 });
-addKeyBind(["S", "ArrowDown"], function(key){
-	//move ship backward
-	ship.move(ship.angle, -shipacc);
-});
-var ship = new GameObject({"canvas":gamecanvas,"imgsrc":"assets/img/ship.png", "x":20, "y":40, "angle":60, "speed":0.1, "spin":0.0});
+var ship = new GameObject({"canvas":gamecanvas,"imgsrc":"assets/img/ship.png", "x":20, "y":40, "angle":60, "speed":0.1, "spin":0.0},false);
+})
 </script>
 </html>

@@ -1,4 +1,24 @@
 
+HTMLCollection.prototype.map = Array.prototype.map;
+
+
+window.loadScript = function(scriptName) {
+	var s = document.getElementsByTagName('script');
+	var thissrc ="";
+	for(var i=s.length-1; i>=0 && thissrc.length<=0; --i)
+		thissrc=s[i].src;
+	var scriptFolder = thissrc.substr(0, thissrc.lastIndexOf('/')+1)
+	var scriptsrctoadd = scriptFolder+scriptName;
+	if(s.map(a=>a.src).includes(scriptsrctoadd))
+		return;
+	var script = document.createElement("script");
+	script.src = scriptsrctoadd;
+	document.head.appendChild(script);
+}
+
+loadScript("CanvasTools.js");
+loadScript("GameObject.js");
+
 const animationMethod = window.requestAnimationFrame ? window.requestAnimationFrame : window.setTimeout;
 class GameCanvas{
 	constructor(canvasname, funcpaint){

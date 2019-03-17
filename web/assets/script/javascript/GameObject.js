@@ -1,4 +1,5 @@
 
+loadScript("Vector.js")
 
 class GameObject
 {
