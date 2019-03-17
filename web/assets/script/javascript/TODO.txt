@@ -3,7 +3,7 @@ TODO list:
 
 
 
-Fix pages that depended on the old GameObject file.
+Fix KeyBinds so it works even when keys are modified with the shift key. i.e., make it so a bind on '1' updates when the '!' is toggled.
 
 
 

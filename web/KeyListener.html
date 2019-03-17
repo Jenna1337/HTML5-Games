@@ -1,16 +1,15 @@
 <!DOCTYPE html>
 <head>
-<script src="assets/script/javascript/keys.js"></script>
-<script src="assets/script/javascript/locations.js"></script>
-<script src="assets/script/javascript/KeyListener.js"></script>
+<meta charset="UTF-8">
+<script src="assets/script/javascript/KeyBinds.js"></script>
 <script>
 function onload(){
-	addKeyListener(document, KEY_WILDCARD, function(event){
-		document.getElementById("keydown").innerHTML = 
-				locations[event.location] + " " + event.key;
-	}, function(event){
-		document.getElementById("keyup").innerHTML =
-				locations[event.location] + " " + event.key;
+	addKeyBind(KEY_WILDCARD, ()=>{}, function(key){
+		document.getElementById("keydown").innerHTML = key;
+		console.log("keydown",key)
+	}, function(key){
+		document.getElementById("keyup").innerHTML = key;
+		console.log("keyup",key)
 	});
 };
 </script>
