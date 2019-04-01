@@ -26,11 +26,14 @@ class GameObject
 		this.deltay = 0;
 		this.vector = new Vector(0, 0);
 		this.spin = initspin;
-		this.type = (typeof (obj.type))=='string' ? obj.type.split(' ') : "";
-		this.collidable = obj.hasCollision;
+		this.type = (typeof (obj.type))=='string' ? obj.type.split(' ') : obj.type;
+		this.collidable = obj.hasOwnProperty('collidable') ? obj.collidable : obj.hasCollision;
 		this.collisionHandlers = {};
 		this.canvas.addGameObject(this);
 		this.move(initangle, initspd);
+	}
+	clone(){
+		return new GameObject(this);
 	}
 	shiftPosition(x, y) {
 		this.x += x;

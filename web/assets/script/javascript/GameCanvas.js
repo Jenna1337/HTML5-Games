@@ -19,13 +19,13 @@ window.loadScript = function(scriptName) {
 loadScript("CanvasTools.js");
 loadScript("GameObject.js");
 
-const animationMethod = window.requestAnimationFrame ? window.requestAnimationFrame : window.setTimeout;
+
 class GameCanvas{
 	constructor(canvasname, funcpaint){
 		this.maxfps = 60;
 		this.lastupdate = 0;
 		if(typeof(funcpaint)=="undefined" || funcpaint==null)
-			funcpaint=()=>{}
+			funcpaint=()=>{};
 		if(typeof(canvasname)=="undefined" || canvasname==null)
 			throw new Error("Canvas name cannot be "+canvasname+".");
 		this.canvas = document.getElementById(canvasname);
@@ -36,44 +36,79 @@ class GameCanvas{
 		this.canvasname = canvasname;
 		this.funcpaint=funcpaint;
 		this.typestyles={};
-		var t = this;
+		this.setUpdatesPerSecond(60);
+		this.canvas.tabIndex=0;
+		this.focused=false;
+		var t=this;
+		this.canvas.addEventListener('focus', (evt)=>{
+			t.focused=true;
+			evt.preventDefault()
+		});
+		this.canvas.addEventListener('blur', (evt)=>{
+			t.focused=false;
+			evt.preventDefault()
+		});
 		this.paint();
 	}
+	hasFocus(){
+		return this.focused;
+	}
 	redrawAll(){
-		this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height)
+		this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height);
 		for(var i in this.gameObjects){
 				this.gameObjects[i].redraw();
 			this.gameObjects[i].paint(this.ctx);
 		}
 	}
+	setUpdatesPerSecond(updatespersecond){
+		this.updateinterval = 1000/updatespersecond;
+	}
 	paint(timestamp=performance.now()){
+		
 		if(timestamp-1000/this.maxfps>=this.lastupdate){
 			this.lastupdate = timestamp;
-			try{
+			if(this.funcpaint){
 				this.funcpaint(this.canvas);
-			}catch(e){};
-			for(var bind of keybinds)
-				if(bind.active)
-					bind.callback();
+			}
 			this.redrawAll();
 		}
-		if(window.handleBindings)
-			handleBindings();
 		var t = this;
-		animationMethod((arg)=>t.paint(arg), 1000/this.maxfps);
+		window.setTimeout(()=>{
+			if(window.handleBindings)
+				handleBindings();
+			window.requestAnimationFrame((arg)=>t.paint(arg));
+		},this.updateinterval);
 	}
 	addGameObject(gameobj){
 		this.gameObjects.push(gameobj);
+		this.resortGameObjectsByDrawOrder();
+	}
+	setDrawOrder(aDrawOrder){
+		if((typeof aDrawOrder)!=(typeof []))
+			throw new Error('Invalid type');
+		this.draworder = aDrawOrder;
+		this.resortGameObjectsByDrawOrder();
+	}
+	resortGameObjectsByDrawOrder(){
+		gamecanvas.gameObjects.sort((a,b)=>{
+			var ia=this.draworder.length,ib=ia;
+			for(var i in this.draworder){
+				if(a.type.includes(this.draworder[i]))
+					ia=i;
+				if(b.type.includes(this.draworder[i]))
+					ib=i;
+			}
+			return ia-ib;
+		}).map(a=>a.type)
 	}
 	addTypeStyles(typestyles){
 		for(var st in typestyles){
 			if(!this.typestyles[st])
 				this.typestyles[st] = {};
 			for(var attr in typestyles[st]){
-				this.typestyles[st][attr] = typestyles[st][attr]
+				this.typestyles[st][attr] = typestyles[st][attr];
 			}
 		}
-		console.log(typestyles)
 	}
 }
 

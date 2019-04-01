@@ -12,6 +12,7 @@
 	</head>
 	<body>
 		<canvas id="gameArea" height="300px" width="500px"></canvas>
+		<span id="gameAreaFPS">test</span>
 	</body>
 	<script>
 /* */
@@ -24,22 +25,30 @@ function addGameObjectRect(obj) {
 
 
 class TypeStyle{
-	constructor(fillStyle, lineWidth='0', strokeStyle='rgba(0,0,0,0)'){
-		this.fillStyle = fillStyle;
-		this.strokeStyle = strokeStyle;
-		this.lineWidth = lineWidth;
+	constructor(...objs){
+		//fillStyle, lineWidth='0', strokeStyle='rgba(0,0,0,0)'
+		for(var i in objs){
+			var obj=objs[i];
+			for(var attr in obj)
+				this[attr]=obj[attr];
+		}
+		//this.fillStyle = fillStyle;
+		//this.strokeStyle = strokeStyle;
+		//this.lineWidth = lineWidth;
 	}
 }
+var typestyleplain={"fillStyle":'black',"lineWidth":0,"strokeStyle":'rgba(0,0,0,0)'};
 const typestyles = {
-	'player':new TypeStyle('blue'),
-	'player2':new TypeStyle('red'),
-	'wall':new TypeStyle('green'),
-	'boundry':new TypeStyle('darkgreen'),
+	'player':new TypeStyle({"fillStyle":'blue',"lineWidth":5,"strokeStyle":'cyan'}),
+	'player2':new TypeStyle({"fillStyle":'red'}),
+	'wall':new TypeStyle(typestyleplain,{"fillStyle":'green'}),
+	'boundry':new TypeStyle(typestyleplain,{"fillStyle":'darkgreen'}),
 };
 var gamecanvas = new GameCanvas("gameArea");
 var gameArea = gamecanvas.canvas;
 window.gamecanvas = gamecanvas
 gamecanvas.addTypeStyles(typestyles)
+gamecanvas.setDrawOrder(['boundry','wall','player']);
 
 
 var boundryWallThickness = 5;
@@ -62,7 +71,7 @@ new GameObject({"canvas":gamecanvas,"type":'wall boundry',"x":0  ,"y":h-t,"width
 new GameObject({"canvas":gamecanvas,"type":'wall boundry',"x":0  ,"y":0  ,"width":t,"height":h,"hasCollision":true})//left wall
 new GameObject({"canvas":gamecanvas,"type":'wall boundry',"x":w-t,"y":0  ,"width":t,"height":h,"hasCollision":true})//right wall
 
-var moveSpeed = 2;
+var moveSpeed = 5;
 addKeyBind(["A","ArrowLeft"], (e)=>player.shiftPosition(-moveSpeed, 0));
 addKeyBind(["W","ArrowUp"], (e)=>player.shiftPosition(0, -moveSpeed));
 addKeyBind(["D","ArrowRight"], (e)=>player.shiftPosition(moveSpeed, 0));
