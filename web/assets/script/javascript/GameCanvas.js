@@ -79,7 +79,9 @@ class GameCanvas{
 			window.requestAnimationFrame((arg)=>t.paint(arg));
 		},this.updateinterval);
 	}
-	addGameObject(gameobj){
+	addGameObject(gameobj, forceaddoverride=false){
+		if(this.gameObjects.includes(gameobj) || forceaddoverride)
+			return;
 		this.gameObjects.push(gameobj);
 		this.resortGameObjectsByDrawOrder();
 	}
@@ -90,15 +92,17 @@ class GameCanvas{
 		this.resortGameObjectsByDrawOrder();
 	}
 	resortGameObjectsByDrawOrder(){
-		gamecanvas.gameObjects.sort((a,b)=>{
-			var ia=this.draworder.length,ib=ia;
-			for(var i in this.draworder){
-				if(a.type.includes(this.draworder[i]))
-					ia=i;
-				if(b.type.includes(this.draworder[i]))
-					ib=i;
+		this.gameObjects.sort((a,b)=>{
+			if(this.draworder){
+				var ia=this.draworder.length,ib=ia;
+				for(var i in this.draworder){
+					if(a.type.includes(this.draworder[i]))
+						ia=i;
+					if(b.type.includes(this.draworder[i]))
+						ib=i;
+				}
+				return ia-ib;
 			}
-			return ia-ib;
 		}).map(a=>a.type)
 	}
 	addTypeStyles(typestyles){

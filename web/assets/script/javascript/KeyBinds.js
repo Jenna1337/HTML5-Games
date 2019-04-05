@@ -15,14 +15,14 @@ var addKeyBind = (function(){
 		bind.active=isdownevent;
 	}
 	const iteratebinds = function(e, isdownevent=e.type=='keydown'){
-		if(keybindspreventdefault)
-			e.preventDefault()
 		var k = e.key.toLowerCase();
 		for(var bind of keybinds){
 			if(Array.isArray(bind.key))
 				for(var b of bind.key){
 					if(checkkey(k,b)){
 						setIsActive(bind,isdownevent,k);
+						if(keybindspreventdefault)
+							e.preventDefault()
 						break;
 					}
 				}
