@@ -12,38 +12,58 @@
 </body>
 <script>
 window.addEventListener('load', ()=>{
-var deltamax = 2;
-var shipacc = 0.05;
-var shipmax = 1;
-var shipturnspeed = 0.1;
-var gamecanvas = new GameCanvas("gamecanvas", 
-		function(canvas){
-			ship.spin = Math.min(Math.max(-deltamax, ship.spin), deltamax);
-			if(ship.vector.velocity > shipmax)
-				ship.vector.velocity = shipmax;
-			if(ship.x < 0)
-				ship.x = canvas.width;
-			else if(ship.x > canvas.width)
-				ship.x = 0;
-			if(ship.y < 0)
-				ship.y = canvas.height;
-			else if(ship.y > canvas.height)
-				ship.y = 0;
-			document.getElementById("ship.vector.velocity").textContent = "ship velocity: "+ship.vector.velocity;
-		});
-addKeyBind(["A", "ArrowLeft"], function(key){
-	//turn ship left
-	ship.turn(-shipturnspeed);
-});
-addKeyBind(["D", "ArrowRight"], function(key){
-	//turn ship right
-	ship.turn(shipturnspeed);
-});
-addKeyBind(["W", "ArrowUp"], function(key){
-	//move ship forward
-	ship.move(ship.angle, shipacc);
-});
-var ship = new GameObject({"canvas":gamecanvas,"imgsrc":"assets/img/ship.png", "x":20, "y":40, "angle":60, "speed":0.1, "spin":0.0},false);
+	var deltamax = 2;
+	var shipacc = 0.05;
+	var shipmax = 1;
+	var shipturnspeed = 0.1;
+	var gamecanvas = new GameCanvas("gamecanvas", 
+			function(canvas){
+				if(ship){
+					ship.spin = Math.min(Math.max(-deltamax, ship.spin), deltamax);
+					if(ship.vector.velocity > shipmax)
+						ship.vector.velocity = shipmax;
+					if(ship.x < 0)
+						ship.x = canvas.width;
+					else if(ship.x > canvas.width)
+						ship.x = 0;
+					if(ship.y < 0)
+						ship.y = canvas.height;
+					else if(ship.y > canvas.height)
+						ship.y = 0;
+					document.getElementById("ship.vector.velocity").textContent = "ship velocity: "+ship.vector.velocity;
+					if(ship_flames.active){//don't bother updating the position if it's not visible
+						ship_flames.x=ship.x;
+						ship_flames.y=ship.y;
+						ship_flames.angle=ship.angle;
+						var shipflamecoordsoffset = ship_flames.vector.clone().translate(ship_flames.angle, -ship.img.width);
+						ship_flames.x += shipflamecoordsoffset.x;
+						ship_flames.y += shipflamecoordsoffset.y;
+					}
+				}
+			});
+	var ship = new GameObject({"canvas":gamecanvas,"imgsrc":"assets/img/ship_body.png", "x":20, "y":40, "angle":60, "speed":0.1, "spin":0.0});
+	var ship_flames = new GameObject({"canvas":gamecanvas});
+	gamecanvas.addGameObject(ship)
+	addKeyBind(["A", "ArrowLeft"], function(key){
+		//turn ship left
+		ship.turn(-shipturnspeed);
+	});
+	addKeyBind(["D", "ArrowRight"], function(key){
+		//turn ship right
+		ship.turn(shipturnspeed);
+	});
+	addKeyBind(["W", "ArrowUp"], function(key){
+		//move ship forward
+		ship.move(ship.angle, shipacc);
+	},()=>{
+		//show the flames
+		ship_flames.active=true;
+		ship_flames.img.src="assets/img/ship_flames.png";
+	},()=>{
+		//hide the flames
+		ship_flames.active=false;
+		ship_flames.img.src="";
+	});
 })
 </script>
 </html>
