@@ -33,4 +33,7 @@ class Vector
 		this.velocity = Math.sqrt(dx*dx+dy*dy);
 		return ({x: dx, y: dy});
 	};
+	clone(){
+		return new Vector(this.angle, this.velocity);
+	}
 }

@@ -5,10 +5,10 @@ class GameObject
 {
 	constructor(obj){
 		this.canvas = obj.canvas;
-		this.y = obj.y;
-		this.x = obj.x;
-		this.height = obj.height;
-		this.width = obj.width;
+		this.y = obj.hasOwnProperty('y') ? obj.y : 0;
+		this.x = obj.hasOwnProperty('x') ? obj.x : 0;
+		this.height = obj.hasOwnProperty('height') ? obj.height : 0;
+		this.width  = obj.hasOwnProperty('width') ? obj.width : 0;
 		var initangle = obj.angle;
 		if(typeof(initangle)=="undefined" || initangle==null)
 			initangle = 0;
