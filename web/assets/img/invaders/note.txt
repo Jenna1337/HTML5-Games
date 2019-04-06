@@ -1,0 +1,5 @@
+
+Note:
+font.png has all of the graphics used in the original game.
+font_full.png also includes other ascii characters that don't appear in the game.
+
