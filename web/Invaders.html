@@ -1,24 +1,59 @@
 <!DOCTYPE html>
 <head>
+<meta charset="UTF-8">
 <link rel="stylesheet" href="assets/styles/Common.css">
 <script src="assets/script/javascript/GameCanvas.js"></script>
-<script src="assets/script/javascript/invaders/loadgame.js"></script>
-<script>
-var drawscale = 2;
-var ship;
-var shipspd = 1;
-var gamecanvas;
-var gamespd = 30;
-var keyleft = false;
-var keyright = false;
-var enemymovedist = 2;
-var enemyspd = 1000;
-</script>
+<script src="assets/script/javascript/KeyBinds.js"></script>
+<script src="assets/script/javascript/BitSet.js"></script>
 </head>
-<body onload="loadgame('gamecanvas')">
+<body>
 <!--div id="warning" class="bigred blink-fade">This game is under construction</div-->
-<canvas id="gamecanvas" width="200px" height="100px" style="border:1px solid #000000;"></canvas>
+<canvas id="gamecanvas" width="240px" height="256px" style="border:1px solid #000000;"></canvas>
 <div id="ship.vector.angle"></div>
 <div id="ship.vector.velocity"></div>
 </body>
-
+<script>
+window.addEventListener('load', ()=>{
+	var drawscale = 2;
+	var ship;
+	var shipspd = 3;
+	var gamecanvas;
+	var gamespd = 30;
+	var keyleft = false;
+	var keyright = false;
+	var enemymovedist = 2;
+	var enemyspd = 1000;
+	var gameheight = 256;
+	var gamewidth = 240;
+	var sidepadding = 20;
+	var gamemargin = {'left':sidepadding,'right':gamewidth-sidepadding};
+	var gamecanvas = new GameCanvas("gamecanvas", 
+			function(canvas)
+			{
+				keyleft = keyleft && ship.x > gamemargin.left;
+				keyright = keyright && ship.x < gamemargin.right;
+				if(keyleft)
+				if(keyright)
+					
+					ship.x += shipspd;
+			});
+	ship = new GameObject({'canvas':gamecanvas,'imgsrc':"assets/img/invaders/ship.png", 'x':sidepadding});
+	ship.y = gamecanvas.canvas.height-ship.img.width;
+	addKeyBind("A", function(key){
+		if(ship.x > gamemargin.left)
+			ship.x -= shipspd;//move ship left
+	});
+	addKeyBind("D", function(key){
+		if(ship.x < gamemargin.right)
+		ship.x += shipspd;//move ship right
+	});
+	addKeyBind("W", function(key){
+		//shoot bullet
+		
+	});
+	addKeyBind("S", function(key){
+		
+	});
+});
+</script>
+</html>
