@@ -48,7 +48,8 @@ class GameCanvas{
 			t.focused=false;
 			evt.preventDefault()
 		});
-		this.paint();
+		var t = this;
+		window.setTimeout(()=>t.paint(),1);
 	}
 	hasFocus(){
 		return this.focused;
