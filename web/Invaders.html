@@ -8,7 +8,7 @@
 </head>
 <body>
 <!--div id="warning" class="bigred blink-fade">This game is under construction</div-->
-<canvas id="gamecanvas" width="240px" height="256px" style="border:1px solid #000000;"></canvas>
+<canvas id="gamecanvas" width="240px" height="256px" style="border:1px solid #000000;transform: scale(1.25);transform-origin:top left;"></canvas>
 <div id="ship.vector.angle"></div>
 <div id="ship.vector.velocity"></div>
 </body>
@@ -16,43 +16,61 @@
 window.addEventListener('load', ()=>{
 	var drawscale = 2;
 	var ship;
-	var shipspd = 3;
+	const shipspd = 3;
+	const playershotspeed = 4;
 	var gamecanvas;
-	var gamespd = 30;
 	var keyleft = false;
 	var keyright = false;
 	var enemymovedist = 2;
 	var enemyspd = 1000;
 	var gameheight = 256;
 	var gamewidth = 240;
+	var screenbits = new BitSet(gameheight*gamewidth);//TODO implement BitSet
 	var sidepadding = 20;
 	var gamemargin = {'left':sidepadding,'right':gamewidth-sidepadding};
+	var ufoscores = [100,50,50,100,150,100,100,50,300,100,100,100,50,150,100,50];
+	var ufoscoreindex = 0;
 	var gamecanvas = new GameCanvas("gamecanvas", 
 			function(canvas)
 			{
-				keyleft = keyleft && ship.x > gamemargin.left;
-				keyright = keyright && ship.x < gamemargin.right;
-				if(keyleft)
-				if(keyright)
-					
-					ship.x += shipspd;
+				if(ship){
+					keyleft = keyleft && ship.x > gamemargin.left;
+					keyright = keyright && ship.x < gamemargin.right;
+					if(keyleft)
+						ship.x -= shipspd;
+					if(keyright)
+						ship.x += shipspd;
+				}
+				if(playerbullet){
+					if(playerbullet.active)
+						playerbullet.y -= playershotspeed;
+					if(playerbullet.y < 0){
+						playerbullet.active = false;
+						playerbullet.img.src = "";
+					}
+				}
 			});
 	ship = new GameObject({'canvas':gamecanvas,'imgsrc':"assets/img/invaders/ship.png", 'x':sidepadding});
+	playerbullet = new GameObject({'canvas':gamecanvas,'imgsrc':""});
 	ship.y = gamecanvas.canvas.height-ship.img.width;
-	addKeyBind("A", function(key){
+	addKeyBind(["A", "ArrowLeft"], function(key){
 		if(ship.x > gamemargin.left)
 			ship.x -= shipspd;//move ship left
 	});
-	addKeyBind("D", function(key){
+	addKeyBind(["D", "ArrowRight"], function(key){
 		if(ship.x < gamemargin.right)
 		ship.x += shipspd;//move ship right
 	});
-	addKeyBind("W", function(key){
-		//shoot bullet
-		
-	});
-	addKeyBind("S", function(key){
-		
+	addKeyBind(["W", "ArrowUp", "S", "ArrowDown", "Space"], function(key){
+		if(!playerbullet.active){
+			//shoot bullet
+			playerbullet.img.src = "assets/img/invaders/player-shot.png";
+			playerbullet.x = ship.x;
+			playerbullet.y = ship.y;
+			playerbullet.active = true;
+			ufoscoreindex += 1;
+			ufoscoreindex %= ufoscores.length;
+		}
 	});
 });
 </script>
