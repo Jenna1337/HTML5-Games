@@ -8,7 +8,7 @@
 </head>
 <body>
 <!--div id="warning" class="bigred blink-fade">This game is under construction</div-->
-<canvas id="gamecanvas" width="240px" height="256px" style="border:1px solid #000000;transform: scale(1.25);transform-origin:top left;"></canvas>
+<canvas id="gamecanvas" width="240px" height="256px" style="border:1px solid #000000;transform: scale(2);transform-origin:top left;image-rendering:crisp-edges;"></canvas>
 <div id="ship.vector.angle"></div>
 <div id="ship.vector.velocity"></div>
 </body>
@@ -51,8 +51,8 @@ window.addEventListener('load', ()=>{
 				}
 			});
 	ship = new GameObject({'canvas':gamecanvas,'imgsrc':"assets/img/invaders/ship.png", 'x':sidepadding});
-	playerbullet = new GameObject({'canvas':gamecanvas,'imgsrc':""});
-	ship.y = gamecanvas.canvas.height-ship.img.width;
+	playerbullet = new GameObject({'canvas':gamecanvas,'imgsrc':"",'width':-2});
+	ship.img.onload=()=>{ship.y = gamecanvas.canvas.height-ship.img.height/2-1};
 	addKeyBind(["A", "ArrowLeft"], function(key){
 		if(ship.x > gamemargin.left)
 			ship.x -= shipspd;//move ship left
