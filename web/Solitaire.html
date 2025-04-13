@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8">
+<title>Solitaire</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="color-scheme" content="dark light" />
+<style>
+body {
+	font-family: monospace;
+}
+.inputs {
+	display: flex;
+	flex-wrap: wrap;
+}
+.inputs > * {
+	margin: 1px;
+}
+.card {
+	user-select: none;
+	outline: 1px solid #888;
+	font-size: 800%;
+	line-height: 1;
+	width: fit-content;
+	height: 1lh;
+	display: inline-block;
+	position: relative;
+	background-color: white;
+	color: black;
+	border-radius: 0.05em;
+}
+.card.back {
+	color: #0000;
+	color: transparent;
+}
+.card.back::after {
+	content: "\1F0A0";
+	display: inline-block;
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	inset: 0;
+	color: initial;
+	color: black;
+}
+</style>
+<script>
+const suitNames = [ "Spades", "Hearts", "Diamonds", "Clubs" ];
+const suitColors = [ "black", "red", "red", "black" ];
+const valueNames = [ "Ace", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Jack", "Knight", "Queen", "King" ];
+const cardValueKnight = 11;
+const presets = {
+	"klondike": {
+		"tableau": [1, 2, 3, 4, 5, 6, 7],
+		"decks": 1,
+		"foundations": 4,
+	},
+	"spider": {
+		"tableau": [6, 6, 6, 6, 5, 5, 5, 5, 5, 5],
+		"decks": 2,
+		"foundations": 8,
+	},
+	
+};
+function makeCardElement(suitValue, cardValue){
+	const cardElem = document.createElement("span");
+	cardElem.className = "card";
+	cardElem.title = valueNames[cardValue] + " of " + suitNames[suitValue];
+	cardElem.dataset.suit = suitNames[suitValue];
+	cardElem.dataset.value = cardValue > cardValueKnight ? cardValue : (cardValue + 1);
+	cardElem.innerHTML = "&#x1F0" + (suitValue+10).toString(16).toUpperCase() + (cardValue+1).toString(16).toUpperCase() + ";&#xfe0e;";
+	return cardElem;
+}
+function init(versionName)
+{
+	const main = document.getElementsByTagName("MAIN")[0];
+	const stockpile = document.getElementById("stockpile");
+	const tableau = document.getElementById("tableau");
+	const foundation = document.getElementById("foundation");
+	
+	{
+		const dummyCard = makeCardElement(0, 0);
+		dummyCard.classList.add("back");
+		dummyCard.title = "Card";
+		stockpile.appendChild(dummyCard);
+	}
+	for(let suitValue=0; suitValue<suitNames.length; ++suitValue) {
+		for(let cardValue=0; cardValue<valueNames.length; ++cardValue) {
+			if(cardValue == cardValueKnight){
+				continue;
+			}
+			stockpile.appendChild(makeCardElement(suitValue, cardValue));
+		}
+	}
+}
+</script>
+</head>
+<body onload="init('klondike')">
+<main role="application" aria-labelledby="title">
+<h1 id="title">Solitaire</h1>
+<div id="stockpile" title="Stockpile"></div>
+<div id="tableau" title="Tableau"></div>
+<div id="foundation" title="Foundation"></div>
+</main>
+<template id="tableau-pile-template">
+</template>
+<template id="foundation-pile-template">
+</template>
+</body>
+</html>
