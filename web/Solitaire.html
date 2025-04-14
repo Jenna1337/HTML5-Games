@@ -6,8 +6,30 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="color-scheme" content="dark light" />
 <style>
+:root {
+	--card-selected-color: yellow;
+	--board-color: Canvas;
+	--board-color: light-dark(#35654d, Canvas);
+	--board-color: light-dark(#35654d, #1c1b22);
+	--card-text-color: black;
+	--card-back-color: white;
+}
 body {
 	font-family: monospace;
+	background-color: var(--board-color);
+	
+	background: radial-gradient(ellipse at center, var(--board-color) 0%, var(--board-color) 95%, #000D 100%);
+	
+	box-shadow: 0 0 10vw black inset;
+	margin: 0;
+	padding: 2ex;
+	height: 100dvh;
+	width: 100dvw;
+	box-sizing: border-box;
+}
+h1 {
+	--highlight-color: light-dark(white, black);
+	text-shadow: 0 0 2ex var(--highlight-color), 0 0 1ex var(--highlight-color), 0 0 0.5ex var(--highlight-color);
 }
 .inputs {
 	display: flex;
@@ -25,9 +47,11 @@ body {
 	height: 1lh;
 	display: inline-block;
 	position: relative;
-	background-color: white;
-	color: black;
+	background-color: var(--card-back-color);
+	color: var(--card-text-color);
+	color: attr(data-color color);
 	border-radius: 0.05em;
+	box-shadow: 0 0 0.25ex var(--board-color);
 }
 .card.back {
 	color: #0000;
@@ -42,8 +66,11 @@ body {
 	top: 0;
 	bottom: 0;
 	inset: 0;
-	color: initial;
-	color: black;
+	color: var(--card-text-color);
+}
+.card.selected {
+	box-shadow: 0 0 0.25ex var(--card-selected-color), 0 0 0.25ex var(--board-color), 0 0 0.25ex var(--card-selected-color) inset;
+	z-index: 999;
 }
 </style>
 <script>
@@ -71,6 +98,8 @@ function makeCardElement(suitValue, cardValue){
 	cardElem.dataset.suit = suitNames[suitValue];
 	cardElem.dataset.value = cardValue > cardValueKnight ? cardValue : (cardValue + 1);
 	cardElem.innerHTML = "&#x1F0" + (suitValue+10).toString(16).toUpperCase() + (cardValue+1).toString(16).toUpperCase() + ";&#xfe0e;";
+	cardElem.dataset.color = suitColors[suitValue];
+	cardElem.style = "--card-text-color: " + suitColors[suitValue];
 	return cardElem;
 }
 function init(versionName)
@@ -83,6 +112,7 @@ function init(versionName)
 	{
 		const dummyCard = makeCardElement(0, 0);
 		dummyCard.classList.add("back");
+		dummyCard.classList.add("selected");
 		dummyCard.title = "Card";
 		stockpile.appendChild(dummyCard);
 	}
