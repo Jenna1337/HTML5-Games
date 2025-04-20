@@ -13,6 +13,7 @@
 	--board-color: light-dark(#35654d, #1c1b22);
 	--card-text-color: black;
 	--card-back-color: white;
+	--card-slot-color: cyan;
 }
 body {
 	font-family: monospace;
@@ -31,6 +32,9 @@ h1 {
 	--highlight-color: light-dark(white, black);
 	text-shadow: 0 0 2ex var(--highlight-color), 0 0 1ex var(--highlight-color), 0 0 0.5ex var(--highlight-color);
 }
+main {
+	font-size: 800%;
+}
 .inputs {
 	display: flex;
 	flex-wrap: wrap;
@@ -41,60 +45,142 @@ h1 {
 .card {
 	user-select: none;
 	outline: 1px solid #888;
-	font-size: 800%;
 	line-height: 1;
 	width: fit-content;
 	height: 1lh;
-	display: inline-block;
+	display: block;
 	position: relative;
 	background-color: var(--card-back-color);
 	color: var(--card-text-color);
 	color: attr(data-color color);
 	border-radius: 0.05em;
 	box-shadow: 0 0 0.25ex var(--board-color);
+	overflow: clip;
 }
-.card.back {
-	color: #0000;
-	color: transparent;
+.hideBack {
+	& .card.back, #tableau .card:not(:last-of-type) {
+		color: #0000;
+		color: transparent;
+	}
+	& .card.back::after, #tableau .card:not(:last-of-type)::after {
+		content: "\1F0A0";
+		display: inline-block;
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		inset: 0;
+		color: var(--card-text-color);
+	}
 }
-.card.back::after {
-	content: "\1F0A0";
+#stockpile {
+	height: 1lh;
+	width: 3lh;
 	display: inline-block;
-	position: absolute;
-	left: 0;
-	right: 0;
-	top: 0;
-	bottom: 0;
-	inset: 0;
-	color: var(--card-text-color);
+	vertical-align: top;
+	
+	.card {
+		display: block;
+		margin-bottom: -1lh;
+	}
+	& .card.back, .card:not(:last-of-type) {
+		color: #0000;
+		color: transparent;
+	}
+	& .card.back::after, .card:not(:last-of-type)::after {
+		content: "\1F0A0";
+		display: inline-block;
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		inset: 0;
+		color: var(--card-text-color);
+	}
 }
 .card.selected {
 	box-shadow: 0 0 0.25ex var(--card-selected-color), 0 0 0.25ex var(--board-color), 0 0 0.25ex var(--card-selected-color) inset;
 	z-index: 999;
 }
+.card:hover {
+	box-shadow: 0 0 0.25ex var(--card-selected-color), 0 0 0.25ex var(--board-color), 0 0 0.25ex var(--card-selected-color) inset;
+}
+.card-slot {
+	box-shadow: 0 0 0.25ex var(--card-slot-color), 0 0 0.25ex var(--card-slot-color) inset;
+	color: transparent !important;
+	background-color: transparent !important;
+}
+.tabrow {
+	display: inline-block;
+	vertical-align: top;
+	padding: 0.25ex;
+}
+.tabrow .card {
+	margin-bottom: -0.75lh;
+}
+#foundation {
+	height: 1lh;
+	display: inline-block;
+	width: calc(100% - 3lh);
+	
+	.card {
+		display: inline-block;
+		margin: 0.125ex;
+	}
+}
 </style>
 <script>
+function shuffleCards(array) {
+	for (let i = array.length - 1; i > 0; i--) {
+		const j = Math.floor(Math.random() * (i + 1));
+		[array[i], array[j]] = [array[j], array[i]];
+	}
+	return array;
+}
+
 const suitNames = [ "Spades", "Hearts", "Diamonds", "Clubs" ];
 const suitColors = [ "black", "red", "red", "black" ];
 const valueNames = [ "Ace", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Jack", "Knight", "Queen", "King" ];
 const cardValueKnight = 11;
+
 const presets = {
 	"klondike": {
 		"tableau": [1, 2, 3, 4, 5, 6, 7],
-		"decks": 1,
-		"foundations": 4,
+		"suits": suitNames,
+		"foundationsAreManual": true,
 	},
-	"spider": {
+	"spider-1": {
 		"tableau": [6, 6, 6, 6, 5, 5, 5, 5, 5, 5],
-		"decks": 2,
-		"foundations": 8,
+		"suits": Array(8).fill(suitNames[0]),
+		"foundationsAreManual": false,
+		"alternateColors": false
+	},
+	"spider-2": {
+		"tableau": [6, 6, 6, 6, 5, 5, 5, 5, 5, 5],
+		"suits": Array(4).fill([suitNames[0], suitNames[1]]).flat(),
+		"foundationsAreManual": false,
+	},
+	"spider-4": {
+		"tableau": [6, 6, 6, 6, 5, 5, 5, 5, 5, 5],
+		"suits": [suitNames, suitNames].flat(),
+		"foundationsAreManual": false,
+	},
+	"freecell": {
+		"tableau": [7, 7, 7, 7, 6, 6, 6, 6],
+		"suits": [suitNames, suitNames].flat(),
+		"foundationsAreManual": true,
+		"freecells": 4,
+		"hideBack": false,
 	},
 	
 };
+
 function makeCardElement(suitValue, cardValue){
 	const cardElem = document.createElement("span");
 	cardElem.className = "card";
-	cardElem.title = valueNames[cardValue] + " of " + suitNames[suitValue];
+	cardElem.dataset.name = valueNames[cardValue] + " of " + suitNames[suitValue];
 	cardElem.dataset.suit = suitNames[suitValue];
 	cardElem.dataset.value = cardValue > cardValueKnight ? cardValue : (cardValue + 1);
 	cardElem.innerHTML = "&#x1F0" + (suitValue+10).toString(16).toUpperCase() + (cardValue+1).toString(16).toUpperCase() + ";&#xfe0e;";
@@ -102,37 +188,72 @@ function makeCardElement(suitValue, cardValue){
 	cardElem.style = "--card-text-color: " + suitColors[suitValue];
 	return cardElem;
 }
-function init(versionName)
-{
-	const main = document.getElementsByTagName("MAIN")[0];
+function makeEmptyCardSlot(){
+	const cardSlot = makeCardElement(0, 0);
+	cardSlot.classList.add("card-slot");
+	cardSlot.title = "Card";
+	return cardSlot;
+}
+function makeDeckFromPreset(gameType) {
+	const main = document.getElementById("main");
 	const stockpile = document.getElementById("stockpile");
 	const tableau = document.getElementById("tableau");
 	const foundation = document.getElementById("foundation");
 	
+	const preset = presets[gameType];
+	let deck = [];
+	
+	main.classList.toggle("hideBack", preset.hideBack ?? true);
+	
+	for(let suitName of preset.suits)
 	{
-		const dummyCard = makeCardElement(0, 0);
-		dummyCard.classList.add("back");
-		dummyCard.classList.add("selected");
-		dummyCard.title = "Card";
-		stockpile.appendChild(dummyCard);
-	}
-	for(let suitValue=0; suitValue<suitNames.length; ++suitValue) {
+		let suitValue = suitNames.indexOf(suitName);
 		for(let cardValue=0; cardValue<valueNames.length; ++cardValue) {
 			if(cardValue == cardValueKnight){
 				continue;
 			}
-			stockpile.appendChild(makeCardElement(suitValue, cardValue));
+			deck.push(makeCardElement(suitValue, cardValue));
 		}
 	}
+	deck = shuffleCards(deck);
+	
+	for(let tab of preset.tableau)
+	{
+		const tabrow = document.createElement("div");
+		tabrow.className = "tabrow";
+		tabrow.append(...deck.slice(0,tab));
+		[...tabrow.children].forEach((c,i,a)=>{
+			if(i<a.length-1){
+				c.title = "Card";
+			}
+			else{//front card
+				c.title = c.dataset.name;
+			}
+		})
+		deck = deck.slice(tab);
+		tableau.appendChild(tabrow);
+	}
+	stockpile.append(...deck);
+	
+	
+	for(let i=0; i<preset.suits.length; ++i)
+	{
+		const suitSlot = makeEmptyCardSlot();
+		suitSlot.classList.add("suitSlot");
+		foundation.appendChild(suitSlot);
+	}
+	
+}
+function init(versionName)
+{
+	makeDeckFromPreset(versionName);
 }
 </script>
 </head>
 <body onload="init('klondike')">
-<main role="application" aria-labelledby="title">
 <h1 id="title">Solitaire</h1>
-<div id="stockpile" title="Stockpile"></div>
-<div id="tableau" title="Tableau"></div>
-<div id="foundation" title="Foundation"></div>
+<main id="main" role="application" aria-labelledby="title">
+<div id="stockpile" title="Stockpile"></div><div id="foundation" title="Foundation"></div><div id="tableau" title="Tableau"></div>
 </main>
 <template id="tableau-pile-template">
 </template>
