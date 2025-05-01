@@ -1,0 +1,99 @@
+<svg width="16px" height="256px" xmlns="http://www.w3.org/2000/svg">
+	<style>
+		svg{
+			background-color: #fff;
+		}
+		.cu{translate:0   0px;}
+		.cf{translate:0  16px;}
+		.cq{translate:0  32px;}
+		.cr{translate:0  48px;}
+		.cn{translate:0  64px;}
+		.cm{translate:0  80px;}
+		.ck{translate:0  96px;}
+		.c8{translate:0 112px;}
+		.c7{translate:0 128px;}
+		.c6{translate:0 144px;}
+		.c5{translate:0 160px;}
+		.c4{translate:0 176px;}
+		.c3{translate:0 192px;}
+		.c2{translate:0 208px;}
+		.c1{translate:0 224px;}
+		.c0{translate:0 240px;}
+		.dn{transform: translate(1px,  1px);}
+		.mine{stroke:#000;fill:#000;}
+	</style>
+	<symbol id="cellu">
+		<path d="m0,0 h16l-2,2 h-12 v12 l-2,2z" fill="#fff"/>
+		<path d="m16,0 v16h-16l2,-2 h12 v-12 z" fill="#000"/>
+	</symbol>
+	<symbol id="celld">
+		<path d="m0,0 h16v1h-15v15h-1z" fill="#000"/>
+	</symbol>
+	<symbol id="quest">
+		<circle cx="8" cy="12" r="1.128" fill="#000"/>
+		<path d="m 7 10 h 2 c 0 -2 2 -3 2 -5 c 0 -2 -2 -2 -3 -2 c -1 0 -3 0 -3 2 a 1 1 0 0 0 2 0 a 1 1 0 0 1 2 0 c 0 2 -2 3 -2 5 z " fill="#000" />
+	</symbol>
+	<symbol id="mine">
+		<path d="M8.5,2v13M2,8.5h13M4,4l9,9M4,13l9,-9" stroke="#000" stroke-width="1px" stroke-linecap="butt" fill="rgba(0,0,0,0)"/>
+		<circle cx="8.5" cy="8.5" r="4.75"/>
+		<circle cx="7" cy="7" r="1.128" fill="#fff"/>
+	</symbol>
+	<g>
+		<rect x="0" y="0" height="48" width="16" fill="#808080"/>
+		<use href="#cellu" class="cu"/>
+		
+		<use href="#cellu" class="cf"/>
+		<path d="m8,8h1v2h1v1h2v2h-8v-2h2v-1h2z" class="cf" fill="#000"/>
+		<path d="m3.5,5.5l4.5,2.5h1v-5h-1z" class="cf" fill="#000"/>
+		
+		<use href="#cellu" class="cq"/>
+		<use href="#quest" class="cq"/>
+		
+		<rect x="0" y="0" height="16" width="16" fill="#000" class="cr"/>
+		<use href="#celld" class="cr"/>
+		<path d="M8.5,2v13M2,8.5h13M4,4l9,9M4,13l9,-9" stroke="#fff" stroke-width="1px" stroke-linecap="butt" fill="rgba(0,0,0,0)" class="cr"/>
+		<circle cx="8.5" cy="8.5" r="4.75" fill="#fff" class="cr"/>
+		<circle cx="7" cy="7" r="1.128" fill="#000" class="cr"/>
+		
+		<use href="#celld" class="cn"/>
+		<path d="M8.5,2v13M2,8.5h13M4,4l9,9M4,13l9,-9" stroke="#808080" stroke-width="1px" stroke-linecap="butt" fill="rgba(0,0,0,0)" class="cn"/>
+		<circle cx="8.5" cy="8.5" r="4.75" fill="#808080" class="cn"/>
+		<circle cx="7" cy="7" r="1.128" fill="#fff" class="cn"/>
+		<path d="m2.75,3.25l11.5,11.5M14.25,3.25l-11.5,11.5" stroke="#000" stroke-width="1.5px" stroke-linecap="butt" fill="rgba(0,0,0,0)" class="cn"/>
+		
+		
+		<use href="#celld" class="cm"/>
+		<path d="M8.5,2v13M2,8.5h13M4,4l9,9M4,13l9,-9" stroke="#000" stroke-width="1px" stroke-linecap="butt" fill="rgba(0,0,0,0)" class="cm"/>
+		<circle cx="8.5" cy="8.5" r="4.75" fill="#000" class="cm"/>
+		<circle cx="7" cy="7" r="1.128" fill="#fff" class="cm"/>
+		
+		<use href="#celld" class="ck"/>
+		<use href="#quest" class="ck dn"/>
+		
+		<use href="#celld" class="c8"/>
+		<path d="m10,3 a 2.5 2.5 0 0 1 0 6 v-2 a 2.5 2.5 0 0 1 0 6 h-4a 2.5 2.5 0 0 1 0 -6v2a 2.5 2.5 0 0 1 0 -6h.5v2a 1 1 0 0 0 0 2v2a 1 1 0 0 0 0 2h3a 1 1 0 0 0 0 -2 h-3v-2h3a 1 1 0 0 0 0 -2 h-3v-2z" class="c8" fill="#000"/>
+		
+		<use href="#celld" class="c7"/>
+		<path d="m3,3v2h7l-4,8h3l4,-7v-3" class="c7" fill="#000"/>
+		
+		<use href="#celld" class="c6"/>
+		<path d="m6,7h5.5a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1 -1.5 1.5h-7a1.5 1.5 0 0 1 -1.5 -1.5v-7a1.5 1.5 0 0 1 1.5 -1.5h7.5v2h-5.5a 1 1 0 0 0 0 2h-.5v2h0.5a 1 1 0 0 0 0 2h3a 1 1 0 0 0 0 -2h-3.5" class="c6" fill="#000" fill-rule="evenodd"/>
+		
+		<use href="#celld" class="c5"/>
+		<path d="m3,3h10v2h-7v2h4 a 3 3 0 0 1 0 6 h-7v-2h6.5 a 1 1 0 0 0 0 -2 h-6.5z" class="c5" fill="#000"/>
+		
+		<use href="#celld" class="c4"/>
+		<path d="m3,9h6v4h3v-4h1v-2h-1v-4h-3v4h-3l2,-4h-3l-2,4z" class="c4" fill="#000"/>
+		
+		<use href="#celld" class="c3"/>
+		<path d="m3,3h7 a 2.5 2.5 0 0 1 0 6 v-2 a 2.5 2.5 0 0 1 0 6 h-7v-2h6.5a 1 1 0 0 0 0 -2 h-3.5v-2h3.5 a 1 1 0 0 0 0 -2 h-6.5z" class="c3" fill="#000"/>
+		
+		<use href="#celld" class="c2"/>
+		<path d="m 3 11 v 2 h 10 v -2 h -6 c -1 0 6 -3 6 -5 c 0 -3 -2 -3 -5 -3 c -3 0 -5 0 -5 3 h 3 c 0 -1 1 -1 2 -1 c 1 0 2 0 2 1 c 0 1 -7 4 -7 5 m 3 3" class="c2" fill="#000"/>		
+		
+		<use href="#celld" class="c1"/>
+		<path d="m5,13 v-2h2v-4h-2v-.5l3.5,-3.5h1.5 v8h2v2z" class="c1" fill="#000"/>
+		
+		<use href="#celld" class="c0"/>
+	</g>
+</svg>

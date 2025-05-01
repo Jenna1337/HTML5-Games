@@ -1,0 +1,67 @@
+<svg width="24px" height="120px" xmlns="http://www.w3.org/2000/svg">
+	<style>
+		svg{
+			background-color: #C0C0C0;
+		}
+		.fp{translate:1px 1px;}
+		.fg{translate:0   24px;}
+		.fd{translate:0   48px;}
+		.fo{translate:0   72px;}
+		.fs{translate:0   96px;}
+		.fr{transform: translate(13px, 23px) rotate(180deg);}
+	</style>
+	<symbol id="cellu">
+		<path d="m0,0 h24l-2,2 h-20 v20 l-2,2z" fill="#fff"/>
+		<path d="m24,0 v24h-24l2,-2 h20 v-20 z" fill="#808080"/>
+	</symbol>
+	<symbol id="face">
+		<circle cx="12.5" cy="12.5" r="8" fill="yellow" stroke="black" stroke-width="1px"/>
+	</symbol>
+	<symbol id="smile">
+		<path d="m 16.5 14.5 A 5 5 45 0 1 8.5 14.5" stroke="black" stroke-width="1px" fill="rgba(0,0,0,0)" stroke-linecap="round"/>
+	</symbol>
+	<symbol id="eye">
+		<circle cx="10" cy="10" r="1.125" fill="black" stroke="none" stroke-width="0px"/>
+	</symbol>
+	<symbol id="eyes">
+		<use href="#eye"/>
+		<use href="#eye" style="transform: translate(5px,0);"/>
+	</symbol>
+	<symbol id="xeye">
+		<path d="m 8,11 l3,-3m-3,0l3,3" stroke="black" stroke-width="1px" fill="rgba(0,0,0,0)" stroke-linecap="butt"/>
+	</symbol>
+	<symbol id="smileface">
+		<use href="#face"/>
+		<use href="#smile"/>
+		<use href="#eyes"/>
+	</symbol>
+	<symbol id="glasses">
+		<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 1000 1000"><path d="m320 321c-69 2-152 5-168 7-98 11-138 48-142 132-5 107 39 184 120 210 23 7 35 9 66 9a250 250 0 00167-69c54-52 85-111 89-173 1-19 2-22 7-29 3-5 10-10 16-14 9-4 12-5 25-5s16 1 25 5c6 4 13 9 16 14 5 7 5 10 7 30 4 55 31 111 77 159 40 42 78 64 132 78 13 3 21 4 48 4 29 0 35-1 52-5 77-21 122-77 131-164 6-57-2-104-23-132-20-27-59-44-118-50-38-4-123-6-309-7h320zm294 22c-33 12-50 24-58 42l-5 10-8-7a72 72 0 00-86 0l-8 7-5-11c-9-18-25-29-59-41l-20-7h270l-21 7z"/></svg>
+	</symbol>
+	<g>
+		<path d="m0,0 h24l-1,1 h-22 v22 l-1,1z" fill="#808080"/>
+		<use href="#smileface" class="fp"/>
+		
+		<use href="#cellu" class="fg"/>
+		<use href="#face" class="fg"/>
+		<use href="#smile" class="fg" style="transform: scale(calc(7 / 9)); transform-origin: bottom center; transform-box: fill-box;"/>
+		<use href="#glasses" class="fg" style="transform: translate(7px, 5.3px)"/>
+		<path d="m5,12l2-2h1v1h-1l-2,2z" class="fg"/>
+		<path d="m20,12l-2-2h-1v1h1l2,2z" class="fg"/>
+		
+		<use href="#cellu" class="fd"/>
+		<use href="#face" class="fd"/>
+		<use href="#smile" class="fd" style="transform: rotate(180deg); transform-origin: center center; transform-box: fill-box;"/>
+		<use href="#xeye" class="fd"/>
+		<use href="#xeye" class="fd" style="transform: translate(6px,0);"/>
+		
+		<use href="#cellu" class="fo"/>
+		<use href="#face" class="fo"/>
+		<circle cx="12.5" cy="15.5" r="2" fill="none" stroke="black" stroke-width="1px" class="fo"/>
+		<use href="#eye" class="fo" style="transform: scale(calc(4 / 3)); transform-origin: center right; transform-box: fill-box;"/>
+		<use href="#eye" class="fo" style="transform: scale(calc(4 / 3)) translate(4px,0); transform-origin: center left; transform-box: fill-box;"/>
+		
+		<use href="#cellu" class="fs"/>
+		<use href="#smileface" class="fs"/>
+	</g>
+</svg>

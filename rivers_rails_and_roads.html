@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="author" content="Jenna Sloan">
+<title>Rivers, Rails, and Roads</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+/*body {
+	margin: 0;
+	padding: 0;
+}*/
+svg {
+	border: 1px solid grey;
+	display: block;
+	min-width: max-content;
+	max-width: max-content;
+	min-height: max-content;
+	max-height: max-content;
+}
+svg g {
+	transform-origin: center;
+	/*transform-style: preserve-3d;*/
+}
+.tilegroupcontainer {
+	transform-origin: center;
+	transform: perspective(1000px) rotateX(0deg);
+}
+#gamecontainer {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+svg .faketilebase:hover {
+	stroke: yellow !important;
+}
+.scrollarrow {
+	fill: #222;
+	stroke: #222;
+	stroke-linejoin: round;
+	stroke-width: 3px;
+}
+g:hover>.scrollarrow {
+	stroke-width: 6px;
+}
+/*g:active>.scrollarrow,*/ .scrollarrow.active {
+	stroke-width: 2px !important;
+	fill: #000;
+	stroke: #000;
+}
+
+</style>
+<script src="libs/KeyBinds.js" id="KeyBindsScript"></script>
+<script src="libs/SVGTransformUtils.js" id="SVGTransformUtils"></script>
+<script id="">
+window.addEventListener("DOMContentLoaded",function(){
+
+function findComments(el) {
+    var arr = [];
+    for(var i = 0; i < el.childNodes.length; i++) {
+        var node = el.childNodes[i];
+        if(node.nodeType === Node.COMMENT_NODE || node.nodeType === Node.TEXT_NODE) {
+            arr.push(node);
+        } else {
+            arr.push(...findComments(node));
+        }
+    }
+    return arr;
+};
+findComments(document.getElementById("tilegraphicspreview")).forEach(a=>a.remove());
+function rotateArray(arr, k){
+	if(arr.length == 0){
+		return arr;
+	}
+	while(k < arr.length){
+		k += arr.length;
+	}
+	k %= arr.length;
+	return arr.concat(arr).slice(k, k+arr.length);
+}
+
+
+const rawcounts = `Tile Metadata													
+	top			left			bottom			right			
+tile type	top-left	top-center	top-right	left-top	left-center	left-bottom	bottom-left	bottom-center	bottom-right	right-top	right-center	right-bottom	count
+Split	road	0	0	0	0	0	road	rail	river	0	rail	river	1
+	0	0	0	0	rail	0	0	0	river	road	rail	river	1
+Straight	river	0	0	0	0	0	river	0	0	0	0	0	6
+	0	rail	0	0	0	0	0	rail	0	0	0	0	6
+	river	rail	0	0	0	0	river	rail	0	0	0	0	6
+	0	0	road	0	0	0	0	0	road	0	0	0	6
+	river	0	road	0	0	0	river	0	road	0	0	0	6
+	0	rail	road	0	0	0	0	rail	road	0	0	0	6
+	river	rail	road	0	0	0	river	rail	road	0	0	0	6
+Curve	0	0	0	0	0	0	river	0	0	river	0	0	4
+	0	0	0	0	0	0	0	0	river	0	0	river	4
+	0	0	0	0	0	0	road	0	0	road	0	0	4
+	0	0	0	0	0	0	0	0	road	0	0	road	4
+	0	0	0	0	0	0	0	rail	0	0	rail	0	8
+	0	0	0	0	0	0	river	0	road	river	0	road	4
+	0	0	0	0	0	0	road	0	river	road	0	river	4
+	0	0	0	0	0	0	river	rail	0	river	rail	0	4
+	0	0	0	0	0	0	0	rail	river	0	rail	river	4
+	0	0	0	0	0	0	road	rail	0	road	rail	0	4
+	0	0	0	0	0	0	0	rail	road	0	rail	road	4
+	0	0	0	0	0	0	river	rail	road	river	rail	road	4
+	0	0	0	0	0	0	road	rail	river	road	rail	river	4
+Switch	0	0	0	river	0	0	0	0	0	0	rail	0	1
+	0	0	0	river	0	0	0	0	0	river	rail	0	1
+	0	0	0	river	0	0	0	0	0	0	0	road	1
+	0	0	0	river	0	0	0	0	0	river	0	road	1
+	0	0	0	river	0	0	0	0	0	0	rail	road	1
+	0	0	0	river	0	0	0	0	0	river	rail	road	1
+	0	0	0	0	rail	0	0	0	0	river	0	0	1
+	0	0	0	0	rail	0	0	0	0	river	rail	0	1
+	0	0	0	0	rail	0	0	0	0	0	0	road	1
+	0	0	0	0	rail	0	0	0	0	river	0	road	1
+	0	0	0	0	rail	0	0	0	0	0	rail	road	1
+	0	0	0	0	rail	0	0	0	0	river	rail	road	1
+	0	0	0	river	rail	0	0	0	0	river	0	0	1
+	0	0	0	river	rail	0	0	0	0	0	rail	0	1
+	0	0	0	river	rail	0	0	0	0	0	0	road	1
+	0	0	0	river	rail	0	0	0	0	river	0	road	1
+	0	0	0	river	rail	0	0	0	0	0	rail	road	0
+	0	0	0	river	rail	0	0	0	0	river	rail	road	1
+	0	0	0	0	0	road	0	0	0	river	0	0	1
+	0	0	0	0	0	road	0	0	0	0	rail	0	1
+	0	0	0	0	0	road	0	0	0	river	rail	0	1
+	0	0	0	0	0	road	0	0	0	river	0	road	1
+	0	0	0	0	0	road	0	0	0	0	rail	road	1
+	0	0	0	0	0	road	0	0	0	river	rail	road	1
+	0	0	0	river	0	road	0	0	0	river	0	0	1
+	0	0	0	river	0	road	0	0	0	0	rail	0	1
+	0	0	0	river	0	road	0	0	0	river	rail	0	1
+	0	0	0	river	0	road	0	0	0	0	0	road	1
+	0	0	0	river	0	road	0	0	0	0	rail	road	1
+	0	0	0	river	0	road	0	0	0	river	rail	road	1
+	0	0	0	0	rail	road	0	0	0	river	0	0	1
+	0	0	0	0	rail	road	0	0	0	0	rail	0	1
+	0	0	0	0	rail	road	0	0	0	river	rail	0	0
+	0	0	0	0	rail	road	0	0	0	0	0	road	1
+	0	0	0	0	rail	road	0	0	0	river	0	road	1
+	0	0	0	0	rail	road	0	0	0	river	rail	road	1
+	0	0	0	river	rail	road	0	0	0	river	0	0	1
+	0	0	0	river	rail	road	0	0	0	0	rail	0	1
+	0	0	0	river	rail	road	0	0	0	river	rail	0	1
+	0	0	0	river	rail	road	0	0	0	0	0	road	1
+	0	0	0	river	rail	road	0	0	0	river	0	road	1
+	0	0	0	river	rail	road	0	0	0	0	rail	road	1
+`;
+var tilemetadata = (function(){
+	const startrow = 3;
+	var depth = 0;
+	var counts = [];
+	var headers = null;
+	var tiletype = "";
+	var headmatcher = null;
+	var lines = rawcounts.split("\n").map(line=>line.split("\t")).forEach((row,i)=>{
+		if(i == (startrow-1)){
+			headers = row.map(r=>r.replace(/[- ]./g, x=>x[1].toUpperCase()).trim());
+		}
+		if(i == (startrow-2)){
+			let headerheaders = row.map(r=>r.replace(/[- ]./g, x=>x[1].toUpperCase()).trim()).filter(k=>k);
+			headmatcher = new RegExp('^('+headerheaders.join('|')+')(?=[A-Z]\\w+$)', 'g');
+		}
+		if(i >= startrow && row.length > 2){
+			if(row[0] !== ""){
+				tiletype = row[0];
+			}
+			let entry = ({});
+			headers.forEach((th,thi)=>{
+				let m = null;
+				if(m = th.match(headmatcher)){
+					entry[m] ??= ({});
+					entry[m][th]=row[thi];
+				}
+				entry[th]=row[thi];
+			});
+			entry.tileType = tiletype;
+			
+			entry.graphics = {"simple":[generateTileSVGGroup(entry)],"fancy":[]};
+			
+			counts.push(entry);
+		}
+	});
+	return counts;
+})();
+var tiles = (function(){
+	var o = [];
+	tilemetadata.forEach((m,r)=>{
+		for(var i=0;i<m.count;++i){
+			var mm = m;
+			var ga = m.graphics["simple"];
+			if(i >= ga.length){
+				console.warn("using more tiles than graphics for tile at row "+r);
+			}
+			mm.image = ga[i % ga.length];
+			o.push(mm);
+		}
+	});
+	return o;
+})();
+var basetile = null;
+function generateTileSVGGroup(tilemeta){
+	const colors = {
+		"river": "blue",
+		"rail": "black",
+		"road": "red"
+	};
+	const strokeWidth = 10;
+	const r = (strokeWidth+5)/2;
+	const height = 100;
+	const width = 100;
+	const cy = height/2;
+	const cx = width/2;
+	const spacing = 0.2;
+	const sidetop = cy - height * spacing;
+	const sidebot = cy + height * spacing;
+	const flatlft = cx - width * spacing;
+	const flatrgt = cx + width * spacing;
+	const connectionpoints = {
+		topLeft:   flatlft+" "+"0",
+		topCenter:     cx +" "+"0",
+		topRight:  flatrgt+" "+"0",
+		
+		leftTop:    "0"+" "+sidetop,
+		leftCenter: "0"+" "+cy,
+		leftBottom: "0"+" "+sidebot,
+		
+		bottomLeft:   flatlft+" "+height,
+		bottomCenter:     cx +" "+height,
+		bottomRight:  flatrgt+" "+height,
+		
+		rightTop:    width+" "+sidetop,
+		rightCenter: width+" "+cy,
+		rightBottom: width+" "+sidebot,
+	};
+	
+	var graphics = null;
+	
+	var tileconnections = [...Object.entries(tilemeta.top),...Object.entries(tilemeta.left),...Object.entries(tilemeta.bottom),...Object.entries(tilemeta.right)];
+	var connections = {};
+	tileconnections.forEach(p=>{
+		if(0 != Number(p[1])) {
+			connections[p[1]] ??= [];
+			connections[p[1]].push(p[0]);
+		}
+	});
+	
+	basetile ??= document.querySelector(".tile");
+	var newtileg = basetile.cloneNode(true);
+	newtileg.id="";
+	newtileg.removeAttribute("id");
+	tileconnections.forEach(pair=>{
+		if(pair[1]!=="0"){
+			newtileg.dataset[pair[0]]=pair[1];
+		}
+	});
+	newtileg.dataset["totalcount"] = tilemeta.count;
+	
+	//hide and set defaults
+	newtileg.querySelectorAll(".rpath").forEach(p=>{
+		p.setAttribute("visibility","hidden");
+	});
+	
+	//calculate and assign paths
+	Object.entries(connections).forEach((kv)=>{
+		var tileType = kv[0];
+		var points = kv[1].map(a=>connectionpoints[a].split(" "));
+		var pathelem = newtileg.querySelector("."+tileType);
+		//var pathelem = document.createElementNS(newtileg.namespaceURI, "path");
+		pathelem.class = "rpath "+tileType;
+		var endpoint = null;//for connections that terminate in this tile
+		if(points.length == 1){
+			var loc=kv[1][0];
+			if(loc.match(/^(?:top|bottom)(?=[A-Z])/g)){
+				endpoint = [points[0][0],cy];
+			}else if(loc.match(/^(?:left|right)(?=[A-Z])/g)){
+				endpoint = [cx,points[0][1]];
+			}else{
+				throw "connection point specifier not found: \""+loc+"\"";
+			}
+			points.push(endpoint);
+		}
+		if(points.length != 2){
+			throw "data error";
+		}
+		var x1 = points[0][0];
+		var y1 = points[0][1];
+		var x2 = points[1][0];
+		var y2 = points[1][1];
+		var pathtext = "M"+x1+","+y1;
+		var strokeColor = colors[tileType];
+		
+		if(x1 == x2){
+			//vertical line
+			pathtext += "V"+y2;
+		}
+		else if(y1 == y2){
+			//horizontal line
+			pathtext += "H"+x2;
+		}
+		else {
+			//curve
+			pathtext += "Q"+x1+","+y2+" "+x2+","+y2;
+		}
+		
+		if(endpoint){
+			let circ = document.createElementNS(newtileg.namespaceURI, "circle");
+			circ.setAttribute("stroke", "none");
+			circ.setAttribute("fill", strokeColor);
+			circ.setAttribute("cx", endpoint[0]);
+			circ.setAttribute("cy", endpoint[1]);
+			circ.setAttribute("r", r);
+			//add a circle at endpoint
+			newtileg.querySelector(".rotates").appendChild(circ);
+		}
+		//Note: stroke, stroke-witdh, fill, and fill-opacity are overrided by the CSS styles
+		pathelem.setAttribute("stroke", strokeColor);
+		pathelem.setAttribute("stroke-width", strokeWidth);
+		pathelem.setAttribute("d", pathtext);
+		pathelem.setAttribute("fill","none");
+		pathelem.setAttribute("fill-opacity","0");
+		pathelem.removeAttribute("visibility","hidden");
+	});
+	const margin = 5;
+	var tilegroup = document.querySelector("#tilegraphicspreview .tilegroup");
+	var c = tilegroup.childElementCount;
+	var boxw = document.querySelector("#tilegraphicspreview").getAttribute("width");
+	var maxinrow = Math.floor(boxw/width);
+	var posx = (c%maxinrow);
+	var posy = Math.floor(c/maxinrow);
+	newtileg.dataset.posX = posx;
+	newtileg.dataset.posY = posy;
+	newtileg.setAttribute("transform", "translate("+(margin+width)*posx+" "+posy*(margin+height)+")");
+	
+	newtileg.querySelectorAll(".rpath[visibility=\"hidden\"]").forEach(hiddenelem=>hiddenelem.remove());
+	tilegroup.appendChild(newtileg);
+	
+	return newtileg;
+}
+const tileSelectorAt = (x, y) => `[data-pos-x="${x}"][data-pos-y="${y}"]`;
+function getTileAt(tilegroup,posx,posy){
+	return tilegroup.querySelector(tileSelectorAt(posx,posy));
+}
+const faketile = document.getElementById("faketile");
+const faketilevalid = document.getElementById("faketile-valid");
+const faketileinvalid = document.getElementById("faketile-invalid");
+const gametilearea = document.querySelector("#gamebox .tilegroup.svggridlayout");
+window.gametilearea = gametilearea;
+function doLayoutSVGTileGridLayoutInternal(gridbase, spacing=0, margin=0, forcedscale=null){
+	
+	//set transforms 
+	
+	var minposX = Infinity;
+	var maxposX = -Infinity;
+	var minposY = Infinity;
+	var maxposY = -Infinity;
+	
+	Array.from(gridbase.querySelectorAll(".tile")).forEach(elem=>{
+		var base = elem.querySelector(".tilebase");
+		var width = Number(base.getAttribute("width"));
+		var height = Number(base.getAttribute("height"));
+		var posx = Number(elem.dataset.posX);
+		var posy = Number(elem.dataset.posY);
+		var realposx = posx * (spacing+width);
+		var realposy = posy * (spacing+height);
+		realposx += margin;
+		realposy += margin;
+		
+		if(realposx-margin*2 < minposX) minposX = realposx-margin*2;
+		if((realposx+height) > maxposX) maxposX = realposx+height;
+		if(realposy-margin*2 < minposY) minposY = realposy-margin*2;
+		if((realposy+width) > maxposY) maxposY = realposy+width;
+		
+		elem.setAttribute("transform", "translate("+(realposx)+" "+(realposy-height/2)+")");
+		elem.style.transform = "translate("+(realposx)+"px,"+(realposy-height/2)+"px)";
+		
+		//set border visibility
+		
+		//elem.querySelector(".borderright")?.setAttribute("visibility", gridbase.querySelector("[data-pos-x=\""+(posx+1)+"\"][data-pos-y=\""+(posy+0)+"\"] .borderleft") ? "hidden" : "visible");
+		//elem.querySelector(".borderleft")?.setAttribute("visibility", gridbase.querySelector("[data-pos-x=\""+(posx-1)+"\"][data-pos-y=\""+(posy+0)+"\"] .borderright") ? "hidden" : "visible");
+		//elem.querySelector(".bordertop")?.setAttribute("visibility", gridbase.querySelector("[data-pos-x=\""+(posx+0)+"\"][data-pos-y=\""+(posy-1)+"\"] .borderbottom") ? "hidden" : "visible");
+		//elem.querySelector(".borderbottom")?.setAttribute("visibility", gridbase.querySelector("[data-pos-x=\""+(posx+0)+"\"][data-pos-y=\""+(posy+1)+"\"] .bordertop") ? "hidden" : "visible");
+		
+		function setBorderVisibility(className, otherClassName, dx, dy){
+			var opposingBorder = gridbase.querySelector(tileSelectorAt(posx + dx, posy + dy)+" "+otherClassName);
+			elem.querySelector(className)?.setAttribute("visibility", opposingBorder ? "hidden" : "visible");
+		}
+		
+		setBorderVisibility(".borderright", ".borderleft", 1, 0);
+		setBorderVisibility(".borderbottom", ".bordertop", 0, 1);
+		setBorderVisibility(".borderleft", ".borderright", -1, 0);
+		setBorderVisibility(".bordertop", ".borderbottom", 0, -1);
+		
+		/*[
+		[ ".borderright", 1, 0 ],
+		[ ".borderbottom", 0, 1 ],
+		[ ".borderleft", -1, 0 ],
+		[ ".bordertop", 0, -1]
+		].map(([className, dx, dy],i,a) => elem.querySelector(className)?.setAttribute("visibility", gridbase.querySelector("[data-pos-x=\""+(posx + dx)+"\"][data-pos-y=\""+(posy + dy)+"\"] "+a[(i+2)%a.length][0]) ? "hidden" : "visible"));
+		*/
+	})
+	
+	//var svgroot = gridbase.ownerSVGElement;
+	
+	//var rootwidth = Number(svgroot.getAttribute("width"));
+	//var rootheight = Number(svgroot.getAttribute("height"));
+	var rootwidth = Number(gridbase.dataset.width);
+	var rootheight = Number(gridbase.dataset.height);
+	var rootcx = rootwidth/2;
+	var rootcy = rootheight/2;
+	var contentwidth = (maxposX - minposX);
+	var contentheight = (maxposY - minposY);
+	
+	contentwidth += margin;
+	contentheight += margin;
+	
+	var tilescx = contentwidth/2 + minposX;
+	var tilescy = contentheight/2 + minposY;
+	var scalex = rootwidth / contentwidth;
+	var scaley = rootheight / contentheight;
+	var scale = forcedscale ? (forcedscale==="scaley" ? scaley : (forcedscale==="scalex"? scalex : Number(forcedscale))): Math.min(scalex,scaley);
+	var gametranslatex = scale*(rootcx-tilescx);
+	var gametranslatey = scale*(rootcy-tilescy);
+	
+	gridbase.setAttribute("transform", 
+			"translate("+gametranslatex+" "+gametranslatey+")"
+			+" scale("+scale+")"
+	);
+	gridbase.style.transform = "translate("+gametranslatex+"px,"+gametranslatey+"px)"
+			+" scale("+scale+")";
+}
+function doLayoutSVGTileGridLayout(spacing=0, margin=0){
+	document.querySelectorAll(".svggridlayout").forEach(gridbase=>{
+		doLayoutSVGTileGridLayoutInternal(gridbase, spacing, margin);
+	});
+}
+var allowAnywhere = false;
+function updateFakeTileLocations(tilegroup) {
+	tilegroup.querySelectorAll(".faketile").forEach(t=>t.remove());
+	
+	tilegroup.querySelectorAll(".tile").forEach(tile=>{
+		var posx = Number(tile.dataset.posX);
+		var posy = Number(tile.dataset.posY);
+		
+		function addFakeTileWithChecks([dx,dy,sidename]){
+			//check if we actually have a connection there
+			if(allowAnywhere || Object.keys(tile.dataset).filter(a=>a.startsWith(sidename)).length>0){
+				let dv = [dx+posx,dy+posy];
+				//no neighbor
+				if(!getTileAt(tilegroup,dv[0],dv[1])) {
+					let newfaketile = faketile.cloneNode(true);
+					newfaketile.id="";
+					newfaketile.removeAttribute("id");
+					newfaketile.dataset.posX = dv[0];
+					newfaketile.dataset.posY = dv[1];
+					
+					let evtbox = newfaketile.querySelector(".eventtarget");
+					evtbox.addEventListener("click",()=>{
+						selectTile(newfaketile)
+					});
+					evtbox.setAttribute("cursor", "pointer");
+					evtbox.style.cursor = "pointer";
+					
+					tilegroup.appendChild(newfaketile);
+				}
+			}
+		}
+		[[0,1,"bottom"],[1,0,"right"],[-1,0,"left"],[0,-1,"top"]].forEach(addFakeTileWithChecks);
+	});
+}
+function getValidRotations(tile, faketile) {
+	function getNeighbors(t) {
+		function getNeighbor(dx,dy){
+			var x = Number(t.dataset.posX);
+			var y = Number(t.dataset.posY);
+			return getTileAt(gametilearea, x+dx, y+dy);
+		}
+		return ({
+			"top":    getNeighbor(0, -1),
+			"right":  getNeighbor(1, 0),
+			"bottom": getNeighbor(0, 1),
+			"left":   getNeighbor(-1, 0)
+		});
+	};
+	var neighbors = getNeighbors(faketile);
+	var comps = Object.entries(neighbors).map(([s,t])=>(t!=null && t.classList.contains("faketile") ? undefined : compareTiles(tile,t,s)));
+	comps = comps.filter(c=>c!=null);
+	var unfilteredchecks = comps.reduce((o,v)=>o=Object.fromEntries(Object.entries(v).map(a=>[a[0],o[a[0]]&&a[1]])));//intersect arrays; only used for when a tile has multiple neighboring tiles
+	var rots = Object.entries(unfilteredchecks).filter(r=>r[1]).map(p=>Number(p[0])); //filter valid rotations 
+	
+	return rots;
+}
+function compareTiles(tile1, tile2, side) {
+	if(tile2 == null) {
+		return null;
+	}
+	const sideConnectionNames = {//in clockwise order for easy comparing
+		"top":    ["topLeft", "topCenter", "topRight"],
+		"right":  ["rightTop", "rightCenter", "rightBottom"],
+		"bottom": ["bottomRight", "bottomCenter", "bottomLeft"],
+		"left":   ["leftBottom", "leftCenter", "leftTop"]
+	};
+	function getRotationModifier(tile) {
+		let rawRot = Number(tile.dataset.rotation);
+		while(rawRot<0) {
+			rawRot += 360;//extra checks just in case
+		}
+		rawRot %= 360;//extra checks just in case
+		return rawRot/90;//Note: 3 is number of connections per side
+	}
+	function getConnections(tile){
+		return Object.entries(sideConnectionNames).map(([s,sns])=>sns.map(sn=>tile.dataset[sn]));
+	}
+	var r1 = getRotationModifier(tile1);
+	var r2 = getRotationModifier(tile2);
+	var c1 = getConnections(tile1);
+	var c2 = getConnections(tile2);
+	
+	c1 = rotateArray(c1, -r1);//negative for counter-clockwise
+	c2 = rotateArray(c2, r2+2).map(inner=>inner.reverse());//Note: the +2 and reverse flips the connections so we can compare
+	//c2 = c2.rotateArray[c2[2],c2[3],c2[0],[1]];//replaced with the +2 above
+	
+	var rots = [0,90,180,270];
+	
+	function compareWithRotation(r){
+		var comps = c1.map((s,si)=>{
+			var filtered = s.map((cv,i,ar)=>(cv==c2[si][i]));
+			return filtered.length <= 0 ? false : filtered.reduce((a,v)=>a&&v);
+		});
+		
+		var cnames = rotateArray(Object.keys(sideConnectionNames),0);
+		comps = Object.fromEntries(comps.map((c,ci)=>[cnames[ci],c]));
+		
+		c1 = rotateArray(c1,-1);//for the multiple different rotations; also it's negative for counter-clockwise
+		return comps;
+	}
+	rots = Object.fromEntries(rots.map(r=>[r,compareWithRotation(r)[side]]));
+	return rots;
+}
+
+var selectedtile = null;
+const seloutline = document.getElementById("selection-outline");
+function selectTile(tile){
+	if(selectedtile){
+		let prevtilebase = selectedtile.querySelector(".tilebase");
+		prevtilebase.setAttribute("stroke", "none");
+		prevtilebase.setAttribute("stroke-width", "0");
+		
+		seloutline.setAttribute("visibility", "hidden");
+	}
+	if(tile.classList.contains("faketile")){
+		//selectedtile
+		if(selectedtile != null){
+			let validrots = getValidRotations(selectedtile, tile);
+			if(validrots.length > 0){
+				//TODO
+			}
+			console.log(validrots);
+		}
+		//TODO
+	}else{
+		selectedtile = tile;
+		let selectilebase = selectedtile.querySelector(".tilebase");
+		selectilebase.setAttribute("stroke", "yellow");
+		selectilebase.setAttribute("stroke-width", "10");
+		
+		let playerinv = document.getElementById("player1-inv");//.querySelector(".tilegroup.svggridlayout");
+		if(selectedtile.parentElement!=playerinv){
+			playerinv.appendChild(tile);
+		}
+		playerinv.querySelectorAll(".tile").forEach((tile,i)=>{
+			tile.dataset.posY = 0;
+			tile.dataset.posX = i;
+		});
+		updateFakeTileLocations(gametilearea);
+		doLayoutSVGTileGridLayout();
+		
+		doLayoutSVGTileGridLayoutInternal(playerinv, 5, 5, "scaley");
+		
+		//seloutline.setAttribute("visibility", "visible");
+		seloutline.setAttribute("transform", tile.getAttribute("transform"));
+		playerinv.appendChild(seloutline);
+	}
+	console.log(tile);
+	//update faketile colors 
+	gametilearea.querySelectorAll(".faketile").forEach(faketile=>{
+		
+		let newfaketile = null;
+		let validrotations = selectedtile ? getValidRotations(selectedtile, faketile) : [];//TODO check current player's inventory
+		let valid = selectedtile == null ? null : (selectedtile && validrotations.length > 0);
+		
+		if(valid===true){
+			newfaketile = faketilevalid.cloneNode(true);
+		}else if(valid===false){
+			newfaketile = faketileinvalid.cloneNode(true);
+		}else{
+			newfaketile = faketile.cloneNode(true);
+		}
+		
+		newfaketile.id="";
+		newfaketile.removeAttribute("id");
+		newfaketile.dataset.posX = faketile.dataset.posX;
+		newfaketile.dataset.posY = faketile.dataset.posY;
+		newfaketile.dataset.validRotations = validrotations.join(',');
+		
+		let evtbox = newfaketile.querySelector(".eventtarget");
+		evtbox.addEventListener("click",()=>selectTile(newfaketile));
+		
+		let cursor = valid || valid==null ? "pointer" : "not-allowed";
+		evtbox.setAttribute("cursor", cursor);
+		evtbox.style.cursor = cursor;
+		
+		faketile.parentElement.appendChild(newfaketile);
+		faketile.remove();
+	});
+	doLayoutSVGTileGridLayoutInternal(gametilearea);
+}
+function initgame(){
+	console.log(tilemetadata);
+	console.log(window.tiles=tiles);
+	var typecounts = {};
+	
+	tiles.forEach(t=>{
+		typecounts[t.tileType] = 1 + (typecounts[t.tileType] ?? 0);
+		
+		let g = t.image.cloneNode(true);
+		let c = gametilearea.childElementCount;
+		let maxinrow = 12;
+		let posx = (c%maxinrow);
+		let posy = Math.floor(c/maxinrow);
+		g.dataset.posX = posx;
+		g.dataset.posY = posy;
+		g.dataset.rotation = 0;
+		delete g.dataset.totalcount;
+		g.addEventListener("click", ()=>{
+			selectTile(g);
+		});
+		let cursor = "pointer";
+		g.setAttribute("cursor", cursor);
+		g.style.cursor = cursor;
+		gametilearea.appendChild(g);
+	});
+	delete tilemeta;
+	updateFakeTileLocations(gametilearea);
+	doLayoutSVGTileGridLayout();
+	doLayoutSVGTileGridLayoutInternal(document.querySelector("#tilegraphicspreview .tilegroup.svggridlayout"), 0, 5);
+	typecounts.Total = Object.values(typecounts).reduce((a,b)=>a+b);
+	console.log(typecounts);
+	
+	//TODO add player inventories
+}
+initgame();
+});
+function setTileRotation(tile,rotation){
+	tile.dataset.rotation = rotation;
+	var r = tile.querySelector(".rotates");
+	r.setAttribute("transform", "rotate("+rotation+")");
+	r.setAttribute("transform-origin", "50 50");
+	r.style.transformOrigin = "50px 50px";
+}
+var scrollspeed = 5;
+var scrollerevents = [];
+var scrollbox = null;
+function doscroll(elem, active){
+	elem.querySelector(".scrollarrow").classList.toggle("active", active);
+	
+	console.log(arguments,event);
+	
+	if(active){
+		const scrolloffset = scrollspeed*Number(elem.dataset.scrolldir);
+		scrollerevents.push(window.setInterval(()=>{
+			scrollbox ??= document.getElementById("scrollbox");
+			
+			var boxX = Number(getX(scrollbox));
+			//TODO check bounds
+			setX(scrollbox, boxX+scrolloffset);
+			
+			console.log(scrolloffset);
+		}, 10));
+	}
+	else{
+		for(var i of scrollerevents){
+			window.clearInterval(i);
+		}
+		scrollerevents = [];
+	}
+}
+</script>
+</head>
+<body>
+<div id="title">Work in progress</div>
+<main id="gamecontainer">
+<svg id="tilegraphicspreview" height="720" width="1280" role="img" aria-label="Tile Templates" style="display: none;">
+<g class="tilegroupcontainer" transform-origin="center center" >
+<g class="tilegroup svggridlayout" transform-origin="center center" transform="translate(5 5)">
+<g class="tile" id="exampletile" data-pos-x="0" data-pos-y="0">
+	<g class="rotates">
+		<!--Note: any text nodes, and comment nodes are removed-->
+		<!--TODO for 3D stuff--><!--
+		<rect class="tileback" x="0" y="0" height="100" width="100" fill="#EEAAEE" stroke="none" stroke-width="0" />
+		<rect class="tileside sideright" x="0" y="0" height="100" width="5" fill="#EEAAEE" stroke="none" stroke-width="0" />
+		<rect class="tileside sideleft" x="0" y="0" height="100" width="5" fill="#EEAAEE" stroke="none" stroke-width="0" />
+		<rect class="tileside sidetop" x="0" y="0" height="5" width="100" fill="#EEAAEE" stroke="none" stroke-width="0" />
+		<rect class="tileside sidebottom" x="0" y="0" height="5" width="100" fill="#EEAAEE" stroke="none" stroke-width="0" />
+		<!---->
+		<rect class="tilebase" x="0" y="0" height="100" width="100" fill="#EEEEEE" stroke="none" stroke-width="0" />
+		<path class="rpath river" d="M0,30H100" fill="none" fill-opacity="0" stroke="blue" stroke-width="10" />
+		<path class="rpath rail" d="M0,50Q50,50 50,100" fill="none" fill-opacity="0" stroke="black" stroke-width="10" />
+		<path class="rpath road" d="M70,100Q70,70 100,70" fill="none" fill-opacity="0" stroke="red" stroke-width="10" />
+		
+		<rect class="tileoutline" x="0" y="0" height="100" width="100" fill="none" stroke="black" stroke-width="0.5" /><!--
+		<path class="tileborder borderright" d="M100,0 101,-1 101,101 100,100z" fill="black" stroke="none" stroke-width="0" />
+		<path class="tileborder borderleft" d="M-1,-1 -1,101 0,100 0,0z" fill="gray" stroke="none" stroke-width="0" />
+		<path class="tileborder bordertop" d="M-1,-1 101,-1 100,0 0,0z" fill="gray" stroke="none" stroke-width="0" />
+		<path class="tileborder borderbottom" d="M0,100 -1,101 101,101 100,100z" fill="black" stroke="none" stroke-width="0" />
+		<!---->
+		<rect rx="0.5" class="tileborder borderright" x="100" y="-0.5" height="101" width="1" d="M100,-1 101,-1 101,101 100,101z" fill="black" stroke="none" stroke-width="0" />
+		<rect rx="0.5" class="tileborder borderleft" x="-0.5" y="-0.5" height="101" width="1" fill="gray" stroke="none" stroke-width="0" />
+		<rect rx="0.5" class="tileborder bordertop" x="-0.5" y="-0.5" height="1" width="101" fill="gray" stroke="none" stroke-width="0" />
+		<rect rx="0.5" class="tileborder borderbottom" x="-0.5" y="100" height="1" width="101" fill="black" stroke="none" stroke-width="0" /><!---->
+	</g>
+</g>
+<g id="faketile" class="tile faketile" data-pos-x="1" data-pos-y="0" transform="translate(105 105)">
+	<rect class="tilebase faketilebase" x="0" y="0" height="100" width="100" fill="none" stroke="none" stroke-width="0" visibility="hidden" />
+	<rect class="eventtarget faketilebase" x="3" y="3" height="94" width="94" fill="#777777" stroke="black" stroke-width="4" stroke-dasharray="2" />
+</g>
+<g id="faketile-valid" class="tile faketile valid" data-pos-x="2" data-pos-y="0" transform="translate(105 105)">
+	<rect class="tilebase faketilebase" x="0" y="0" height="100" width="100" fill="none" stroke="none" stroke-width="0" visibility="hidden" />
+	<rect class="eventtarget faketilebase valid" x="3" y="3" height="94" width="94" fill="#99DD99" stroke="#227722" stroke-width="4" stroke-dasharray="2" />
+</g>
+<g id="faketile-invalid" class="tile faketile invalid" data-pos-x="3" data-pos-y="0" transform="translate(105 105)">
+	<rect class="tilebase faketilebase" x="0" y="0" height="100" width="100" fill="none" stroke="none" stroke-width="0" visibility="hidden" />
+	<rect class="eventtarget faketilebase invalid" x="3" y="3" height="94" width="94" fill="#993333" stroke="#550000" stroke-width="4" stroke-dasharray="2" />
+</g>
+</g>
+</g>
+</svg>
+<svg id="gamebox" height="720" width="1280" role="application" >
+<g class="tilegroupcontainer" transform-origin="center center">
+<g class="tilegroup svggridlayout" transform-origin="center center" data-width="1280" data-height="600"></g>
+</g>
+
+<g id="player-inventories" class="playerinventory" transform="translate(0,620)">
+	<rect x="0" y="0" height="100" width="1280" fill="black" fill-opacity="0.7" stroke="#333333" stroke-width="2" />
+	<g id="scrollbox">
+		<g id="player1-inv" class="tilegroup svggridlayout" transform-origin="center center" data-width="1280" data-height="100">
+			<rect id="selection-outline" x="0" y="0" height="100" width="100" fill="none" stroke="yellow" stroke-width="10" visibility="hidden" />
+		</g>
+	</g>
+	<g id="scrollleft" data-scrolldir="-1" onpointerdown="doscroll(this,true)" onpointerup="doscroll(this,false)" onpointerleave="doscroll(this,false)">
+		<rect x="0" y="0" height="100" width="70" fill="#DDDDDD" fill-opacity="1" stroke="#333333" stroke-width="2"/>
+		<path class="scrollarrow" d="M60,10 10,50 60,90z" />
+	</g>
+	<g id="scrollright" data-scrolldir="1" onpointerdown="doscroll(this,true)" onpointerup="doscroll(this,false)" onpointerleave="doscroll(this,false)">
+		<rect x="1210" y="0" height="100" width="70" fill="#DDDDDD" fill-opacity="1" stroke="#333333" stroke-width="2" />
+		<path class="scrollarrow" d="M1220,10 1270,50 1220,90z" />
+	</g>
+</g>
+</svg>
+</main>
+</body>
+</html>

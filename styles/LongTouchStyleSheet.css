@@ -1,0 +1,42 @@
+.longpresscirclecontainer {
+	position: absolute;
+	z-index: 7;
+	width: 0;
+	height: 0;
+}
+.longpresscirclecontainer svg{
+	margin: -3cm;
+	position: relative;
+}
+.longpresscirclecontainer svg>circle {
+	fill: none;
+	filter: drop-shadow(0 0 3px black);
+	stroke: lightgrey;
+	stroke-width: 10;
+	stroke-linecap: round;
+	stroke-dasharray: 250;
+	transform: rotate(-90deg);
+	transform-origin: 50% 50%;
+	/*animation: circledraw1 1s linear infinite;*/
+	animation-name: circledraw1;
+	animation-duration: 1s;
+	animation-timing-function: linear;
+	transition: animation 0s;
+	opacity: 0.9;
+}
+@keyframes circledraw1 {
+	0% {
+		stroke-dashoffset: 250;
+		opacity: 0;
+	}
+	50% {
+		opacity: 0.9;
+	}
+	99% {
+		stroke: lightgrey;
+	}
+	100% {
+		stroke-dashoffset: 0;
+		/*stroke: #0F0;*/
+	}
+}

@@ -1,0 +1,472 @@
+<!doctype html>
+<head>
+<meta charset="UTF-8">
+<meta name="author" content="Jenna Sloan">
+<meta name="application-name" content="Dots and Boxes">
+<title>Dots and Boxes</title>
+<style type="text/css" id="DotsAndBoxesSheet">
+body{
+	margin: 0;
+	padding: 0;
+}
+.dotsandboxesmainarea{
+	border: 5px solid black;
+	background-color: lightgrey;
+	display: inline-block;
+}
+.dotsandboxescontrolarea{
+	float: right;
+	padding: 1ch;
+}
+.dotsandboxescontrolarea .playerlist{
+	font-weight: bold;
+	width: 100%;
+	overflow-y: unset;
+	overflow-x: hidden;
+	display: block;
+	border-collapse: collapse;
+	list-style: inside square;
+}
+.dotsandboxescontrolarea .playerlist::before{
+	/*padding-left: 10px;*/
+	/*content: 'Players';*/
+}
+.dotsandboxescontrolarea .playerlist tr::before{
+	display: list-item;
+	content: '';
+}
+.dotsandboxescontrolarea .playerlist tr>td{
+	display: table-cell;
+}
+.dotsandboxescontrolarea .playerlist tr::before{
+}
+.dotsandboxescontrolarea .playerlist input[type='color']{
+	margin: 0;
+	padding: 0;
+	height: 4ch;
+	width: 4ch;
+}
+.dotsandboxescontrolarea .playerlist input[type='text']{
+	margin: 0;
+	padding: 0;
+	width: auto;
+}
+.dotsandboxesplayarea{
+	border-collapse: collapse;
+	margin: 2ch;
+	float: left;
+	display: inline-block;
+}
+.dotsandboxesplayarea tr>td{
+	position: relative;
+}
+.dotsandboxesplayarea tr:nth-child(2n-1)>td:nth-child(2n-1){
+	height: 0;
+	width: 0;
+	border: 2ch solid black;
+	border-radius: 50%;
+	margin: -1ch;
+	padding: 0;
+	display:block;
+	z-index:3;
+}
+.dotsandboxesplayarea tr:nth-child(2n)>td:nth-child(2n){
+	height: 6ch;
+	width: 6ch;
+}
+.dotsandboxesplayarea tr:nth-child(2n)>td:nth-child(2n-1),
+.dotsandboxesplayarea tr:nth-child(2n-1)>td:nth-child(2n){
+	cursor: pointer;
+	background-color: rgba(0,0,0,0.15);
+}
+.dotsandboxesplayarea tr:nth-child(2n)>td:nth-child(2n-1):hover,
+.dotsandboxesplayarea tr:nth-child(2n-1)>td:nth-child(2n):hover{
+	border-radius: 10px;
+	box-shadow:         0px 0px 30px 0px rgba(255, 255, 0, 1);
+}
+.highlighted{
+	background-color: yellow;
+}
+.dotsandboxesplayarea .filledline{
+	cursor: default !important;
+	box-shadow: none !important;
+}
+</style>
+<script type="application/javascript" id="ColorNameToHexScript">
+
+const colornamehexmap = {
+	"aliceblue":"#f0f8ff",
+	"antiquewhite":"#faebd7",
+	"aqua":"#00ffff",
+	"aquamarine":"#7fffd4",
+	"azure":"#f0ffff",
+	"beige":"#f5f5dc",
+	"bisque":"#ffe4c4",
+	"black":"#000000",
+	"blanchedalmond":"#ffebcd",
+	"blue":"#0000ff",
+	"blueviolet":"#8a2be2",
+	"brown":"#a52a2a",
+	"burlywood":"#deb887",
+	"cadetblue":"#5f9ea0",
+	"chartreuse":"#7fff00",
+	"chocolate":"#d2691e",
+	"coral":"#ff7f50",
+	"cornflowerblue":"#6495ed",
+	"cornsilk":"#fff8dc",
+	"crimson":"#dc143c",
+	"cyan":"#00ffff",
+	"darkblue":"#00008b",
+	"darkcyan":"#008b8b",
+	"darkgoldenrod":"#b8860b",
+	"darkgray":"#a9a9a9",
+	"darkgreen":"#006400",
+	"darkkhaki":"#bdb76b",
+	"darkmagenta":"#8b008b",
+	"darkolivegreen":"#556b2f",
+	"darkorange":"#ff8c00",
+	"darkorchid":"#9932cc",
+	"darkred":"#8b0000",
+	"darksalmon":"#e9967a",
+	"darkseagreen":"#8fbc8f",
+	"darkslateblue":"#483d8b",
+	"darkslategray":"#2f4f4f",
+	"darkturquoise":"#00ced1",
+	"darkviolet":"#9400d3",
+	"deeppink":"#ff1493",
+	"deepskyblue":"#00bfff",
+	"dimgray":"#696969",
+	"dodgerblue":"#1e90ff",
+	"firebrick":"#b22222",
+	"floralwhite":"#fffaf0",
+	"forestgreen":"#228b22",
+	"fuchsia":"#ff00ff",
+	"gainsboro":"#dcdcdc",
+	"ghostwhite":"#f8f8ff",
+	"gold":"#ffd700",
+	"goldenrod":"#daa520",
+	"gray":"#808080",
+	"green":"#008000",
+	"greenyellow":"#adff2f",
+	"honeydew":"#f0fff0",
+	"hotpink":"#ff69b4",
+	"indianred ":"#cd5c5c",
+	"indigo":"#4b0082",
+	"ivory":"#fffff0",
+	"khaki":"#f0e68c",
+	"lavender":"#e6e6fa",
+	"lavenderblush":"#fff0f5",
+	"lawngreen":"#7cfc00",
+	"lemonchiffon":"#fffacd",
+	"lightblue":"#add8e6",
+	"lightcoral":"#f08080",
+	"lightcyan":"#e0ffff",
+	"lightgoldenrodyellow":"#fafad2",
+	"lightgrey":"#d3d3d3",
+	"lightgreen":"#90ee90",
+	"lightpink":"#ffb6c1",
+	"lightsalmon":"#ffa07a",
+	"lightseagreen":"#20b2aa",
+	"lightskyblue":"#87cefa",
+	"lightslategray":"#778899",
+	"lightsteelblue":"#b0c4de",
+	"lightyellow":"#ffffe0",
+	"lime":"#00ff00",
+	"limegreen":"#32cd32",
+	"linen":"#faf0e6",
+	"magenta":"#ff00ff",
+	"maroon":"#800000",
+	"mediumaquamarine":"#66cdaa",
+	"mediumblue":"#0000cd",
+	"mediumorchid":"#ba55d3",
+	"mediumpurple":"#9370d8",
+	"mediumseagreen":"#3cb371",
+	"mediumslateblue":"#7b68ee",
+	"mediumspringgreen":"#00fa9a",
+	"mediumturquoise":"#48d1cc",
+	"mediumvioletred":"#c71585",
+	"midnightblue":"#191970",
+	"mintcream":"#f5fffa",
+	"mistyrose":"#ffe4e1",
+	"moccasin":"#ffe4b5",
+	"navajowhite":"#ffdead",
+	"navy":"#000080",
+	"oldlace":"#fdf5e6",
+	"olive":"#808000",
+	"olivedrab":"#6b8e23",
+	"orange":"#ffa500",
+	"orangered":"#ff4500",
+	"orchid":"#da70d6",
+	"palegoldenrod":"#eee8aa",
+	"palegreen":"#98fb98",
+	"paleturquoise":"#afeeee",
+	"palevioletred":"#d87093",
+	"papayawhip":"#ffefd5",
+	"peachpuff":"#ffdab9",
+	"peru":"#cd853f",
+	"pink":"#ffc0cb",
+	"plum":"#dda0dd",
+	"powderblue":"#b0e0e6",
+	"purple":"#800080",
+	"rebeccapurple":"#663399",
+	"red":"#ff0000",
+	"rosybrown":"#bc8f8f",
+	"royalblue":"#4169e1",
+	"saddlebrown":"#8b4513",
+	"salmon":"#fa8072",
+	"sandybrown":"#f4a460",
+	"seagreen":"#2e8b57",
+	"seashell":"#fff5ee",
+	"sienna":"#a0522d",
+	"silver":"#c0c0c0",
+	"skyblue":"#87ceeb",
+	"slateblue":"#6a5acd",
+	"slategray":"#708090",
+	"snow":"#fffafa",
+	"springgreen":"#00ff7f",
+	"steelblue":"#4682b4",
+	"tan":"#d2b48c",
+	"teal":"#008080",
+	"thistle":"#d8bfd8",
+	"tomato":"#ff6347",
+	"turquoise":"#40e0d0",
+	"violet":"#ee82ee",
+	"wheat":"#f5deb3",
+	"white":"#ffffff",
+	"whitesmoke":"#f5f5f5",
+	"yellow":"#ffff00",
+	"yellowgreen":"#9acd32"
+};
+function colorNamesToHex(...colourarr){
+	return colourarr.map(color=>(
+			(color.toLowerCase() in colornamehexmap) ? colornamehexmap[color.toLowerCase()] : false
+		));
+}
+</script>
+<script type="application/javascript" id="DotsAndBoxesScript">
+var currentplayer;
+var players = colorNamesToHex('red', 'blue', 'green').map((c,i)=>({'color':c}));
+players.active=0;
+players.modifiable=true;
+players.controls=[];
+var boxesleft;
+var t;
+function getElemFromXY(x,y){
+	if(t.tBodies[0].children[y] && t.tBodies[0].children[y].children[x])
+		return t.tBodies[0].children[y].children[x];
+	else return false;
+}
+function istaken(x,y){
+	var k=getElemFromXY(x,y);
+	return k!==false && !!k.style.backgroundColor;
+}
+function fillbox(x,y){
+	getElemFromXY(x,y).style.backgroundColor = players[currentplayer].color;
+	players[currentplayer].score += 1;
+	boxesleft-=1;
+	if(boxesleft<=0)
+		onAllBoxesFilled();
+	return true;
+}
+function fillline(elem){
+	elem.style.backgroundColor = "black"; //players[currentplayer].color;
+	elem.classList.add('filledline');
+}
+var playerdisplayelemlist;
+function setCurrentPlayer(i){
+	playerdisplayelemlist.children[currentplayer].classList.remove('highlighted');
+	currentplayer = i;
+	playerdisplayelemlist.children[currentplayer].classList.add('highlighted');
+}
+function handlelineclick(evt, isvertical, ishorizontal){
+	if(players.modifiable){
+		players.controls.forEach(a=>a.setAttribute('disabled','disabled'))
+		players.modifiable=false;
+	}
+	var scored = false;
+	if(evt.target.style.backgroundColor==""){
+		fillline(evt.target)
+		var x = evt.target.cellIndex;
+		var y = evt.target.parentElement.rowIndex;
+		if(ishorizontal){
+			if(istaken(x-1,y-1) && istaken(x+1,y-1) && istaken(x,y-2))
+				scored |= fillbox(x, y-1);
+			if(istaken(x+1,y+1) && istaken(x-1,y+1) && istaken(x,y+2))
+				scored |= fillbox(x, y+1);
+		}else if(isvertical){
+			if(istaken(x-1,y-1) && istaken(x-1,y+1) && istaken(x-2,y))
+				scored |= fillbox(x-1, y);
+			if(istaken(x+1,y+1) && istaken(x+1,y-1) && istaken(x+2,y))
+				scored |= fillbox(x+1, y);
+		}
+		if(!scored){
+			setCurrentPlayer((currentplayer+1)%players.active);
+		}
+	}
+}
+function onAllBoxesFilled(){
+	var largestscore=-1;
+	var winners=[];
+	for(var i=0;i<players.active;++i){
+		if(players[i].score==largestscore)
+			winners.push(i);
+		else if(players[i].score>largestscore){
+			largestscore=players[i].score;
+			winners=[i]
+		}
+	}
+	var txt ='The winner' + (winners.length>1?'s are':' is')
+			+ ' player'+(winners.length>1?'s ':' ')+winners.map((obj,i,arr)=>(((i>0&&i==arr.length-1)?'and ':'')+(obj+1))).join(', ')
+	//TODO
+	console.log(txt);
+	return txt;
+	
+}
+function generateTable(t,h=5,w=5){
+	setCurrentPlayer(0);
+	if((typeof h)!="number" || (typeof w)!="number")
+		return false;
+	h = Math.floor(h);
+	w = Math.floor(w);
+	if(h<=1 || w<=1)
+		return false;
+	h2=h*2-1;
+	w2=w*2-1;
+	var tb=document.createElement("tbody");
+	for(var r=0;r<h2;++r){
+		var row=document.createElement("tr");
+		for(var c=0;c<w2;++c){
+			var cell=document.createElement("td");
+			var r0=r%2==1;
+			var c0=c%2==1;
+			if(r0 ^ c0)
+				cell.onclick=((r1,c1)=>(
+					a=>handlelineclick(
+						a,r1,c1)))(r0,c0);
+			row.appendChild(cell);
+		}
+		tb.appendChild(row);
+	}
+	t.innerHTML='';
+	t.appendChild(tb);
+	boxesleft=(h-1)*(w-1);
+	for(var k in players)
+		players[k].score=0;
+	resizePlayerList();
+	players.controls.forEach(a=>a.removeAttribute('disabled'));
+	return t;
+}
+function makeButton(text, action, styles={}){
+	var btn = document.createElement("button");
+	btn.textContent = text;
+	btn.onclick = action;
+	for(var x in styles)
+		btn.style[x]=styles[x]
+	return btn;
+}
+function br(){
+	return document.createElement('br');
+}
+function resizePlayerList(){
+	controlpanel.style.height = 'calc('+t.getBoundingClientRect().height+'px + 2ch)';
+	playerdisplayelemlist.style.height = 'calc('+controlpanel.style.height+' - 2 * '+window.getComputedStyle(controlpanel.firstElementChild).height+')';
+}
+function startnewgame(h,w){
+	var retval = generateTable(t,h,w);
+	if(!players.modifiable){
+		players.controls.forEach(a=>a.removeAttribute('disabled'))
+		players.modifiable=true;
+	}
+	return Boolean(retval);
+}
+function initializeTable(targelemid){
+	if((typeof targelemid)!="string")
+		throw new Error("targelemid is not a string");
+	var targ = document.getElementById(targelemid);
+	if(!targ)
+		throw new Error("could not locate element with id \""+targelemid+"\"");
+	targ.classList.add("dotsandboxesmainarea");
+	t=document.createElement("table");
+	t.className="dotsandboxesplayarea";
+	controlpanel=document.createElement("div");
+	controlpanel.className="dotsandboxescontrolarea";
+	controlpanel.appendChild(makeButton("Start a new game",
+			startnewgame,{width:'100%'}));
+	controlpanel.appendChild(br())
+	controlpanel.appendChild(players.controls[players.controls.push(makeButton("Add player",()=>addPlayer(),{width:'50%'}))-1]);
+	controlpanel.appendChild(players.controls[players.controls.push(makeButton("Remove player",()=>removePlayer(),{width:'50%'}))-1]);
+	playerdisplayelemlist = document.createElement("table");
+	playerdisplayelemlist.className = 'playerlist';
+	for(var player of players){
+		addPlayer(player.color);
+	}
+	controlpanel.appendChild(playerdisplayelemlist);
+	currentplayer = 0;
+	targ.appendChild(generateTable(t));
+	targ.appendChild(controlpanel);
+	resizePlayerList();
+}
+function getRandomColor() {
+	var letters = '0123456789ABCDEF';
+	var color = '#';
+	for (var i = 0; i < 6; i++) {
+		color += letters[Math.floor(Math.random() * 16)];
+	}
+	return color;
+}
+function removePlayer(){
+	if(players.active<2)return false;
+	players.active-=1;
+	players[players.active].node.style.display='none';
+	return true;
+}
+function addPlayer(coloroverride){
+	if(players[players.active] && players[players.active].node){
+		players[players.active].node.style.display='';
+	}
+	else{
+		players[players.active]={
+			node:undefined,
+			color:(coloroverride?coloroverride:getRandomColor()),
+			score:0
+		};
+		var playerrow = document.createElement("tr");
+		players[players.active].node=playerrow;
+		var playernumber = document.createElement("div");
+		playernumber.textContent = 'Player\xA0'+(players.active+1)+':';
+		playerrow.appendChild(document.createElement('td').appendChild(playernumber).parentElement);
+		/*var getTitleString = function(str){
+			return 'Click here to change the '+str+' of player '+(players.active+1)+".\n\nNote there must not be an active game running.";
+		};*/
+		var getTitleString = str=>`Click here to change the ${str} of player ${players.active+1}.\n\nNote there must not be an active game running.`;
+		var playernameinput = document.createElement("input");
+		playernameinput.setAttribute("type", "text");
+		playernameinput.placeholder = "Player "+(players.active+1)+' name';
+		playernameinput.title = getTitleString('name');
+		players.controls.push(playernameinput);
+		playerrow.appendChild(document.createElement('td').appendChild(playernameinput).parentElement);
+		var playercolorinput = document.createElement("input");
+		playercolorinput.setAttribute("type", "color");
+		playercolorinput.title = getTitleString('color');
+		playercolorinput.value
+				=players[players.active].node.lastElementChild.style.color
+				=players[players.active].color;
+		playercolorinput.onchange=(
+				(ci)=>((evt)=>{
+						players[ci].color
+								=players[players.active].node.lastElementChild.color
+								=evt.target.value;
+				}))(players.active);
+		players.controls.push(playercolorinput);
+		playerrow.appendChild(document.createElement('td').appendChild(playercolorinput).parentElement);
+		playerdisplayelemlist.appendChild(playerrow);
+	}
+	players.active+=1;
+}
+</script>
+</head>
+<body onload="initializeTable('dotsandboxesholder')">
+<div id="dotsandboxesholder">
+</div>
+</body>
+</html>

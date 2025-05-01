@@ -1,0 +1,1692 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="author" content="Jenna Sloan" />
+<title>Minesweeper</title>
+<style type="text/css" id="MinesweeperStyleSheet">
+body{
+	margin: 0;
+	overflow: hidden;
+}
+* {
+	background-repeat: inherit;
+	transform-origin: top left;
+	font-family: inherit;
+}
+#gamecontainer {
+	font-size: 11px;
+	font-family: Tahoma,"Segoe UI",'artsy',Arial,sans-serif;
+	line-height: 1.1;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	/*image-rendering: crisp-edges;              */
+	/*image-rendering: -moz-crisp-edges;         */
+	/*image-rendering: -o-crisp-edges;           */
+	/*image-rendering: -webkit-optimize-contrast;*/
+	/*position: absolute;
+	z-index: 1;
+}
+#gamecontainer button, #gamecontainer input{
+	font-size: 13px;
+	/*The following border attributes are commented out because they somehow break all of the default settings on the buttons and text input fields */
+	/*border-radius: 0;*/
+	/*border-width: 1px;*/
+	margin: 0;
+}
+#gamemainarea {
+	background-repeat: no-repeat;
+	background-color: #C0C0C0;
+	border-top: 3px solid white;
+	border-left: 3px solid white;
+	display: inline-block;
+}
+#gamemainarea > * {
+	margin-top: 6px;
+	margin-left: 6px;
+	margin-bottom: 5px;
+	margin-right: 5px;
+}
+#gamecontainerwrapper {
+	border: 1px solid #6B6B6B;
+	display: inline-block;
+	position: static;
+}
+#progresscontainer {
+	border-width: 2px;
+	border-style: solid;
+	border-top-color: #808080;
+	border-left-color: #808080;
+	border-bottom-color: #FFFFFF;
+	border-right-color: #FFFFFF;
+	text-align: center;
+	padding-top: 4px;
+	padding-left: 5px;
+	padding-right: 7px;
+}
+#face {
+	margin-bottom: 3px;
+	display: inline-table;
+	height: 24px;
+	width: 24px;
+	border: 1px solid #808080;
+}
+.digitcontainer {
+	border-width: 1px;
+	border-style: solid;
+	border-top-color: #808080;
+	border-left-color: #808080;
+	border-bottom-color: #FFFFFF;
+	border-right-color: #FFFFFF;
+	margin-bottom: 4px;
+	/*height: 23px;*/
+	/*width: 39px;*/
+}
+#digitsmines {
+	float: left;
+}
+#digitstimer {
+	float: right;
+}
+.digit, .digitcontainer > div {
+	height: 23px;
+	width: 13px;
+	display: table-cell;
+}
+#minesweeperboardwrapper {
+	border-width: 3px;
+	border-style: solid;
+	border-top-color: #808080;
+	border-left-color: #808080;
+	border-bottom-color: #FFFFFF;
+	border-right-color: #FFFFFF;
+	white-space: nowrap;
+}
+.minesweeperboard {
+	border-collapse: collapse;
+	overflow: hidden;
+}
+.minesweeperboard td {
+	width: 16px;
+	height: 16px;
+	/*max-width: 16px; */
+	/*max-height: 16px;*/
+	/*min-width: 16px; */
+	/*min-height: 16px;*/
+	cursor: default;
+	padding: 0px;
+	display: inline-block;
+}
+.minesweeperboard td .rowend {
+	white-space: pre;
+	
+}
+
+.dialog {
+	visibility: hidden;
+	background-color: #F0F0F0;
+	border-width: 1px;
+	border-style: solid;
+	position: absolute;
+	margin: 0px;
+	z-index: 2;
+	word-spacing: -1px;
+}
+.dialog input, .dialog button{
+	font-size: 12px;
+}
+.window{
+	border: 1px solid #6B6B6B;
+	left: 2px;
+	white-space: nowrap;
+	padding: 14px;
+}
+.window .titlebar {
+	position: absolute;
+	background-color: white;
+	height: 25px;
+	width: 100%;
+	line-height: 25px;
+	top: -25px;
+	left: -1px;
+	border: inherit;
+	border-bottom: 0px none;
+}
+.window .titlebar .icon16 {
+	width: 16px;
+	height: 16px;
+	margin-inline: 4px;
+	top: 4px;
+	position: relative;
+	display: inline-block;
+}
+.closebutton::before{
+	content: "✕";
+}
+.window .titlebar .closebutton {
+	width: 45px !important;
+	height: 24px !important;
+	top: 0px !important;
+	right: 0px !important;
+	position: absolute !important;
+	text-align: center;
+	color: black !important;
+	padding: 0px !important;
+	border: 0px none !important;
+	background-color: inherit;
+	margin: 0px !important;
+}
+.window .titlebar .closebutton:hover {
+	background-color: #E81123;
+	color: white;
+}
+.window .titlebar .closebutton:active {
+	background-color: #F1707A;
+	color: white;
+}
+
+#gamedialogboxes {
+	position: relative;
+}
+#besttimesdialog {
+	visibility: hidden;
+	position: absolute;
+	top: 46px;
+	overflow: hidden;
+	height: 90px;
+	width: 227px;
+	padding-top: 43px
+}
+#besttimesdialog table {
+	margin-right: -10px;
+}
+#besttimesdialog td {
+	width: 75px;
+	min-width: 75px;
+	max-width: 75px;
+	display: inline-block;
+}
+#besttimesdialog .titlebar {
+	top: -1px !important;
+}
+#clearbesttimesbutton{
+	left: 38px;
+	bottom: 14px;
+	position: absolute;
+	font-size: 12px !important;
+	padding-inline: 3px;
+	letter-spacing: -0.5px;
+}
+#besttimesokbutton{
+	right: 38px;
+	bottom: 14px;
+	position: absolute;
+	font-size: 12px !important;
+	padding-inline: 12px;
+}
+
+#inputnamedialog {
+	width: 154px;
+	height: 167px;
+	border-top-color: #E3E3E3;
+	border-left-color: #E3E3E3;
+	border-right-color: #696969;
+	border-bottom-color: #696969;
+	top: 46px;
+	text-align: center;
+}
+#inputnamedialog > div {
+	padding: 10px;
+	width: calc(100% - 22px);
+	height: calc(100% - 22px);
+	border-width: 1px;
+	border-style: solid;
+	border-top-color: #FFFFFF;
+	border-left-color: #FFFFFF;
+	border-right-color: #A0A0A0;
+	border-bottom-color: #A0A0A0;
+}
+#inputnamedialog > div > div {
+	height: 71px;
+	position: absolute;
+	width: inherit;
+	bottom: 12px;
+	top: 84px;
+}
+#inputnamedialog input {
+	height: 14px;
+	width: 111px;
+	border: 1px #7A7A7A solid;
+	padding: 2px;
+	margin-bottom: 13px;
+	display: inline-block;
+}
+#inputnamedialog button {
+	height: 24px;
+	width: 52px;
+	display: inline-block;
+}
+
+#customgamedialog {
+	height: 110px;
+	width: 167px;
+	font-size: 12px;
+	vertical-align: middle;
+	top: 25px;
+}
+#customgamedialog table {
+	margin-top: 17px;
+	width: 100%;
+}
+#customgamedialog input {
+	width: 38px;
+	height: 20px;
+	padding: 2px;
+	box-sizing: border-box;
+}
+#customgamedialog button {
+	width: 60px;
+	height: 26px;
+	padding: 2px;
+	float: right;
+	box-sizing: border-box;
+}
+#customgamedialog tr:first-child td:last-child{
+	vertical-align: top;
+}
+#customgamedialog tr:nth-child(4) td:last-child{
+	vertical-align: bottom;
+}
+</style>
+<!--Provides compatability for touchscreens-->
+<link rel='stylesheet' href='css/LongTouchStyleSheet.css' id="LongPressCircleStyleSheet" />
+<script src="libs/LongTouchListener.js" id="LongTouchEventSettingScript"></script>
+
+<script src="libs/StyleSheetUtils.js" id="CSSSelectorScript"></script>
+
+<script src="libs/Counters.js"></script>
+
+<!--Generates that lovely menubar-->
+<link rel='stylesheet' href='css/MenubarStyleSheet.css' id="MenubarStyleSheet" />
+<script src="libs/MenubarGenerator.js" id="MenubarGenerator"></script>
+<!--Minesweeper-->
+<script id="MinesweeperScript">
+'use strict';
+//window.init=(function(){
+var gamecontainerstyle = document.styleSheets.findRule("#gamecontainer").style;
+var gamecontainerwrapperstyle = document.styleSheets.findRule("#gamecontainerwrapper").style;
+var sizescale = 1;
+function setsizescale(scale = sizescale){
+	sizescale = scale;
+	gamecontainerwrapperstyle.height = "";
+	gamecontainerwrapperstyle.width = "";
+	gamecontainerstyle.transform = "scale("+scale+")";
+	var rect = container.getBoundingClientRect();
+	gamecontainerwrapperstyle.height = rect.height+"px";
+	gamecontainerwrapperstyle.width = rect.width+"px";
+}
+function setsizescaletodocumentsize(){
+	var gamesize = gamecontainer.getElementsByTagName("*").map((e)=>{
+			var z=e.getBoundingClientRect();
+			return ({height:(z.y+z.height), width:(z.x+z.width)});
+		}).reduce((a,b)=>({height:Math.max(a.height,b.height),width:Math.max(a.width,b.width)}));
+	
+	setsizescale(Math.min(
+		(window.innerHeight-4)/(gamesize.height/sizescale),
+		(window.innerWidth-2)/(gamesize.width/sizescale)
+	));
+}
+var cellStyle = document.styleSheets.findRule(".minesweeperboard td");
+var faceStyle = document.styleSheets.findRule("#face");
+var digitStyle = document.styleSheets.findRule(".digit");
+
+/*Stores the current settings*/
+var settings = {
+/*
+Is question mark enabled?
+*/
+	__markenabled     : true,
+/*
+Is sound mark enabled?
+*/
+	__soundsenabled   : false,
+
+/*
+Sets the current style to the style with the name `stylename`
+*/
+	set currentstyle(stylename = "color_png"){
+		stylename = stylename.toLowerCase();
+		var st = styles[stylename];
+		cellStyle.style.backgroundImage = st.cells;
+		faceStyle.style.backgroundImage = st.faces;
+		digitStyle.style.backgroundImage = st.digits;
+		settings.__currentstyle = st;
+		return settings.currentstyle;
+	},
+
+/*
+Sets the current sounds to the sounds with the name `collectionname`
+*/
+	set currentsounds(collectionname = "default"){
+		collectionname=collectionname.toLowerCase();
+		var collection = Object.values(sounds).find((item)=>item.displayname.toLowerCase()==collectionname)
+		settings.__currentsounds = collection;
+		return collectionname;
+	},
+/*
+Sets if the question mark is enabled
+*/
+	set markenabled(s){
+		settings.__markenabled=s;
+	},
+/*
+Sets if the sound is enabled
+*/
+	set soundsenabled(s){
+		settings.__soundsenabled=s;
+	},
+
+/*
+Gets the currently selected style
+*/
+	get currentstyle(){return settings.__currentstyle},
+/*
+Gets the currently selected sounds
+*/
+	get currentsounds(){
+		return settings.__currentsounds;
+	},
+/*
+Gets if the question mark is enabled
+*/
+	get markenabled(){
+		return settings.__markenabled;
+	},
+/*
+Gets if the sound is enabled
+*/
+	get soundsenabled(){
+		return settings.__soundsenabled
+	},
+/*
+Experimental SVG setting
+*/
+	__usesvg: false,
+	get usesvg(){
+		return this.__usesvg;
+	},
+	set usesvg(x){
+		this.__usesvg=x;
+		var s;
+		if(this.currentstyle.name.includes('color'))
+			s='color';
+		else
+			s='mono';
+		settings.currentstyle = (s+'_'+(this.usesvg?'svg':'png'));
+		return this.usesvg;
+	}
+};
+/*
+Options for game sounds
+
+Format for entries:
+({
+	displayname: "<The name of the sound pack>",
+	clocktick: ({
+		wav: "<wav URL>",
+		mp3: "<mp3 URL>"
+	})
+	gamewon: ({
+		wav: "<wav URL>",
+		mp3: "<mp3 URL>"
+	})
+	minehit: ({
+		wav: "<wav URL>",
+		mp3: "<mp3 URL>"
+	})
+})
+*/
+var sounds = ({
+	defaultsounds:({
+		displayname: "Default",
+		clocktick: ({
+			wav:"sounds/tick.wav",
+			mp3:"sounds/tick.mp3",
+		}),
+		gamewon: ({
+			wav:"sounds/win.wav",
+			mp3:"sounds/win.mp3",
+		}),
+		minehit: ({
+			wav:"sounds/die.wav",
+			mp3:"sounds/die.mp3",
+		}),
+	}),
+});
+/*
+Options for game styles
+
+Format for entries:
+({
+	urls: ({
+		cells: "<image URL>",
+		digits: "<image URL>",
+		faces: "<image URL>",
+	})
+})
+*/
+var styles = ({
+	color_png: ({
+		cells: "url(\"imgs/cells_color.png\")",
+		digits: "url(\"imgs/digits_color.png\")",
+		faces: "url(\"imgs/faces_color.png\")",
+	}),
+	mono_png: ({
+		cells: "url(\"imgs/cells_mono.png\")",
+		digits: "url(\"imgs/digits_mono.png\")",
+		faces: "url(\"imgs/faces_mono.png\")",
+	}),
+	color_svg: ({
+		cells: "url(\"imgs/cells_color.svg\")",
+		digits: "url(\"imgs/digits_color.svg\")",
+		faces: "url(\"imgs/faces_color.svg\")",
+	}),
+	mono_svg: ({
+		cells: "url(\"imgs/cells_mono.svg\")",
+		digits: "url(\"imgs/digits_mono.svg\")",
+		faces: "url(\"imgs/faces_mono.svg\")",
+	}),
+});
+/*
+Sets the name of the styles to their ID
+*/
+Object.keys(styles).forEach(s=>styles[s].name=s)
+/*
+The image Y-offsets for the specific parts and values
+*/
+var parts = ({
+	cells: ({
+		DEFAULT  : "0px",
+		FLAG     : "-16px",
+		MARK     : "-32px",
+		MINE_RED : "-48px",
+		MINE_NONE: "-64px",
+		MINE     : "-80px",
+		MARK_DOWN: "-96px",
+		8        : "-112px",
+		7        : "-128px",
+		6        : "-144px",
+		5        : "-160px",
+		4        : "-176px",
+		3        : "-192px",
+		2        : "-208px",
+		1        : "-224px",
+		0        : "-240px",
+	}),
+	digits: ({
+		"-": "0px",
+		" ": "-23px",
+		"9": "-46px",
+		"8": "-69px",
+		"7": "-92px",
+		"6": "-115px",
+		"5": "-138px",
+		"4": "-161px",
+		"3": "-184px",
+		"2": "-207px",
+		"1": "-230px",
+		"0": "-253px",
+	}),
+	faces: ({
+		FACE_SMILE_DOWN: "0px",
+		FACE_SUNGLASSES: "-24px",
+		FACE_DEAD      : "-48px",
+		FACE_MOUTH_OPEN: "-72px",
+		FACE_SMILE_UP  : "-96px",
+	})
+});
+/*
+Sets the default style to "color"
+*/
+settings.currentstyle=("color_png");
+/*
+Sets the default sounds
+*/
+settings.currentsounds=("default");
+/*
+Plays the sound with the given `soundname`, if `settings.soundsenabled`
+*/
+function playsound(soundname){
+	return settings.soundsenabled ? settings.currentsounds[soundname.toLowerCase()].play() : false;
+}
+/*
+declare gameplay variables
+*/
+/*
+The board HTML element
+*/
+var board;
+/*
+The game container HTML element
+*/
+var container;
+/*
+The game main area HTML element
+*/
+var gamemainarea;
+/*
+The smiley face HTML element
+*/
+var face;
+/*
+The width of the board
+*/
+var boardwidth = 10;
+/*
+The height of the board
+*/
+var boardheight = 10;
+/*
+The size of the board, also the total number of cells
+*/
+var boardsize = boardheight*boardwidth;
+/*
+The total number of mines
+*/
+var minecount = 10;
+/*
+The array of cells
+*/
+var cells = [];
+
+var blocksleft, minesleft;
+var timer;
+/*
+The default name to use for the highscores
+*/
+const besttimesdefaultname = "Anonymous";
+/*
+The maximum value to display on the timer
+*/
+const timermaxvalue = 999;
+/*
+The game difficulty presets and highscore categories
+*/
+const difficulties = {
+	"beginner": {
+		"height": 9,
+		"width": 9,
+		"mines": 10,
+	},
+	"intermediate": {
+		"height": 16,
+		"width": 16,
+		"mines": 40,
+	},
+	"expert": {
+		"height": 16,
+		"width": 30,
+		"mines": 99,
+	}
+};
+/*
+The custom game difficulty
+
+MUST be different than the highscore categories
+*/
+const customDifficulty = "custom";
+/*
+The name to use for the best times in the browser storage
+*/
+const minesweeperbesttimesstoragename = "minesweeperbesttimes";
+/*
+The default best times
+*/
+const defaultbesttimes = (function(){
+		var o={};
+		Object.keys(difficulties).forEach((v)=>{
+			o[v]={
+				'time': timermaxvalue,
+				'name': besttimesdefaultname,
+			};
+		});
+		return o;
+	});
+/*
+The best times; loades the saves values, or uses the default values if not found
+*/
+var besttimes = JSON.parse(window.localStorage.getItem(minesweeperbesttimesstoragename));
+if(!besttimes)
+	besttimes = defaultbesttimes();
+/*
+Converts the string `str` to Title Case
+*/
+function toTitleCase(str){
+	return str.match(/\b(.)(.*?)\b/gm).map(w=>(w[0].toUpperCase()+w.substring(1))).join("")
+}
+/*
+Returns the html table for the highscores
+*/
+function getBestTimesTable(){
+	return "<table>"
+		+ Object.entries(besttimes).map((dife)=>(
+			"<tr><td>" + toTitleCase(dife[0]) + ":</td><td>"
+			 + dife[1].time + " seconds</td><td>"
+			 + dife[1].name + "</td></tr>"
+		)).join("\n") + "</table>";
+}
+/*
+Saves the best time for the given difficulty if it is a preset difficulty
+*/
+function updatebesttimes(difficulty = customDifficulty, newtime, newname){
+	if(difficulties[difficulty]){
+		besttimes[difficulty].time = newtime;
+		besttimes[difficulty].name = newname;
+		window.localStorage.setItem(minesweeperbesttimesstoragename, JSON.stringify(besttimes));
+		return true;
+	}
+	return false;
+}
+/*
+Clears the best times highscores
+*/
+function clearbesttimes(){
+	besttimes = defaultbesttimes();
+	window.localStorage.setItem(minesweeperbesttimesstoragename, JSON.stringify(besttimes));
+}
+var besttimesdialog;
+var besttimestablelocation;
+var besttimesokbutton;
+var clearbesttimesbutton;
+/*
+Shows the best times dialog
+*/
+function showbesttimesdialog(){
+	menubars.active=false;
+	besttimestablelocation.innerHTML = getBestTimesTable();
+	besttimesdialog.style.visibility="visible";
+}
+
+var nameinputdifficultyname;
+var nameinputinput;
+var inputnamedialog;
+var namesubmitbutton;
+function promptForName(){
+	menubars.active=false;
+	nameinputdifficultyname.textContent = currentdifficulty.toLowerCase();
+	nameinputinput.value = besttimesdefaultname;
+	inputnamedialog.style.visibility="visible";
+	
+}
+/*
+Possible storage for smaller data usage:
+
+metadata bitmask:
+0b1000____ - 8 - mine
+0b0100____ - 4 - clicked value
+0b0010____ - 2 - 
+0b0001____ - 1 - border
+
+Displayed value:
+0b____0000 - 0 - down blank
+0b____0001 - 1 - 1
+0b____0010 - 2 - 2
+0b____0011 - 3 - 3
+0b____0100 - 4 - 4
+0b____0101 - 5 - 5
+0b____0110 - 6 - 6
+0b____0111 - 7 - 7
+0b____1000 - 8 - 8
+0b____1001 - 9 - ? down
+0b____1010 - A - mine
+0b____1011 - B - no mine
+0b____1100 - C - red mine
+0b____1101 - D - ? up
+0b____1110 - E - flag
+0b____1111 - F - up blank
+
+While it would take up less memory, it'd likely be more CPU intensive. 
+*/
+/*
+Array consisting of the game area cells, and if each cell is a mine
+*/
+var minelocations;
+/*
+Is the game active?
+*/
+var gameactive = false;
+/*
+The currently selected difficulty
+*/
+var currentdifficulty;
+
+/*
+An array containing a list of the cells to show, if any (this is to help mitigate stack overflows)
+*/
+var toshow = [];
+
+/*
+Shows the cells listed in `toshow`
+*/
+function show(){
+	/*
+	The ID of the cell
+	*/
+	var i;
+	while((i=toshow.shift())!=undefined){
+		var m = cells[i];
+		/*
+		If the cell is already showing, or it is a flag, skip it
+		*/
+		if(m.showing || (getcellvalue(m)=="FLAG"))
+			continue;
+		/*
+		The number of neighboring mines
+		*/
+		/*Count the number or neighboring mines*/
+		var neighbormines=0;
+		iterateneighbors(i,(i1)=>{
+			if(ismine(i1))
+				++neighbormines;
+		});
+		showcell(i,neighbormines);
+		/*
+		Show the neighboring cells if this is not a mine and there are no neighboring mines
+		*/
+		if(neighbormines==0 && !ismine(i))
+			iterateneighbors(i,(i1)=>{
+				if(!cells[i1].showing)
+					toshow.push(i1);
+			});
+	}
+}
+/*
+Call function `f` on cell number `i` if cell `i` is a valid location
+*/
+function ifvaliddo(i,f){
+	if(isvalidlocation(i))
+		f(i);
+}
+/*
+Call function `func` on all of the neighboring cells of cell number `i`
+*/
+function iterateneighbors(i,func){
+	if(i%boardwidth!=0){
+		ifvaliddo(i-boardwidth-1,func);
+		ifvaliddo(i           -1,func);
+		ifvaliddo(i+boardwidth-1,func);
+	}
+	if(i%boardwidth!=boardwidth-1){
+		ifvaliddo(i-boardwidth+1,func);
+		ifvaliddo(i           +1,func);
+		ifvaliddo(i+boardwidth+1,func);
+	}
+	ifvaliddo(i-boardwidth,func);
+	ifvaliddo(i           ,func);
+	ifvaliddo(i+boardwidth,func);
+}
+/*
+Sets the face to the name specified by `facepart`.
+*/
+function setface(facepart){
+	if(facepart==getface())
+		return;
+	previousface = getface();
+	face.style.backgroundPositionY = parts.faces[facepart.toUpperCase()];
+}
+/*
+Gets the name of the current face
+*/
+function getface(){
+	return face ? (face.style.backgroundPositionY ? Object.keys(parts.faces)[Object.values(parts.faces).indexOf(face.style.backgroundPositionY)] : undefined) : undefined;
+}
+/*
+Sets the value of the cell
+*/
+function setcellvalue(m,part){
+	m.style.backgroundPositionY = parts.cells[part];
+}
+/*
+Gets the value of the cell
+*/
+function getcellvalue(m){
+	return m.style.backgroundPositionY ? Object.keys(parts.cells)[Object.values(parts.cells).indexOf(m.style.backgroundPositionY)] : "DEFAULT";
+}
+/*
+Shows the cell, displaying a number if it is not a mine but has neighboring mines
+*/
+function showcell(i,neighbormines){
+	var m = cells[i];
+	m.showing = true;
+	if(ismine(m.i)){
+		setcellvalue(m, "MINE_RED");
+		endgame(false)
+	}
+	else{
+		setcellvalue(m, neighbormines);
+		if(--blocksleft==0)
+			endgame(true);
+	}
+}
+/*
+Checks if the cell is a mine
+*/
+function ismine(i){
+	return minelocations[i];
+}
+/*
+Checks if the selected location is valid
+*/
+function isvalidlocation(i){
+	return (i>=0&&i<boardsize)
+}
+/*
+Changes the state of the cell `i` depending on if the mouse button is down
+*/
+function setmousedown(i,isdown){
+	var m = cells[i];
+	if(isdown)
+		switch(getcellvalue(m)){
+			case "MARK":
+				setcellvalue(m,"MARK_DOWN");
+				break;
+			case "FLAG":
+				break;
+			case "DEFAULT":
+				setcellvalue(m,0);
+				break;
+			default:
+				break;
+		}
+	else
+		switch(getcellvalue(m)){
+			case "MARK_DOWN":
+				setcellvalue(m,"MARK");
+				break;
+			case "MARK":
+				break;
+			case "FLAG":
+				break;
+			case "DEFAULT":
+				break;
+			default:
+				if(!m.showing)
+					setcellvalue(m,"DEFAULT");
+				break;
+		}
+}
+/*
+When the pointer starts hovering over a cell
+*/
+function minemouseenter(evt){
+	if(evt.pointerId!=activepointer.id)
+		return false;
+	if(!gameactive || faceselected)return;
+	var i = evt.target.i;
+	if((evt.buttons&(BUTTONS_MASK_LEFT|BUTTONS_MASK_MIDDLE))>0){
+		setmousedown(i,true);
+		if((evt.buttons&(BUTTONS_MASK_RIGHT|BUTTONS_MASK_MIDDLE))>0){
+			iterateneighbors(i,(i1)=>{
+				setmousedown(i1,true);
+			});
+		}
+	}
+}
+/*
+When the pointer stops hovering over a cell
+*/
+function minemouseleave(evt){
+	if(evt.pointerId!=activepointer.id)
+		return false;
+	if(!gameactive)return;
+	var i = evt.target.i;
+	if((evt.buttons&(BUTTONS_MASK_LEFT|BUTTONS_MASK_MIDDLE))>0){
+		setmousedown(i,false);
+		if((evt.buttons&(BUTTONS_MASK_RIGHT|BUTTONS_MASK_MIDDLE))>0){
+			setmousedownblock(i,false);
+		}
+	}
+}
+/*
+When the pointer starts hovering over the face
+*/
+function facemouseenter(evt){
+	if(evt.pointerId!=activepointer.id)
+		return false;
+	if(faceselected)
+		setface("FACE_SMILE_DOWN");
+}
+/*
+When the pointer stops hovering over the face
+*/
+function facemouseleave(evt){
+	if(evt.pointerId!=activepointer.id)
+		return false;
+	if(faceselected)
+		setface(previousface);
+}
+/*
+When mouse3 (or mouse1 + mouse2) is pressed (creates a 3x3 box that doesn't really do anything)
+*/
+function setmousedownblock(i,add){
+	setmousedown(i,add);
+	iterateneighbors(i,(i1)=>{
+		setmousedown(i1,add);
+	});
+}
+const BUTTON_LEFT = 0, BUTTON_MIDDLE = 1, BUTTON_RIGHT = 2,
+	BUTTONS_MASK_LEFT = 1, BUTTONS_MASK_RIGHT = 2, BUTTONS_MASK_MIDDLE = 4;
+var faceselected = false, clickprotected, somethingwasflagged = false;
+var previousface="FACE_SMILE_UP", primaryprevioustarget;
+/*
+When a mouse button is pressed down or the user is touching the screen
+*/
+function minemousedown(evt,pointerId=0){
+	if(activepointer.id && activepointer.id>=0 && pointerId!=activepointer.id)
+		return;
+	if(!menubars.active)
+		return;
+	activepointer.id = pointerId;
+	if(evt.button==BUTTON_LEFT && evt.target==face){
+			faceselected = true;
+			setface("FACE_SMILE_DOWN");
+	}else if(gameactive && !faceselected){
+		if(evt.buttons!=BUTTONS_MASK_RIGHT)
+			setface("FACE_MOUTH_OPEN");
+		var i = evt.target.i;
+		if(isvalidlocation(i)){
+			switch(evt.buttons){
+				case 0:
+					break;
+				case BUTTONS_MASK_LEFT:
+					setmousedown(i,true);
+					break;
+				case BUTTONS_MASK_RIGHT:
+					if(!somethingwasflagged){
+						flag(evt.target);
+						somethingwasflagged = true;
+					}
+					break;
+				default:
+					setmousedownblock(i,true);
+					break;
+			}
+		}
+	}
+	if(evt.button==BUTTON_LEFT)
+		primaryprevioustarget = evt.target;
+}
+/*
+When a mouse button is depressed down or the user stops touching the screen
+*/
+function minemouseup(evt, pointerId=0, mouseeventoverride = false){
+	if(pointerId!=activepointer.id && (!mouseeventoverride))
+		return;
+	if(!menubars.active)
+		return;
+	if(evt.buttons==0)
+		activepointer.id = -1;
+	if(evt.button==BUTTON_RIGHT && somethingwasflagged)
+		somethingwasflagged=false;
+	if(primaryprevioustarget==face && faceselected && evt.button==BUTTON_LEFT){
+		if(evt.target==face)
+			startgame();
+	//	else
+	//		setface(previousface);
+	}else if(gameactive && primaryprevioustarget!=face){
+		setface("FACE_SMILE_UP");
+		var i = evt.target.i;
+		if(isvalidlocation(i)){
+			if(evt.button==BUTTON_LEFT && evt.buttons==0
+					&& !evt.target.showing && getcellvalue(evt.target)!="FLAG"){
+				if(clickprotected){
+					clickprotected = false;
+					if(ismine(i)){
+						minelocations[i]=false;
+						var movedmine = false;
+						for(var j=0;j<boardsize;++j){
+							if(j==i || ismine(j))
+								continue;
+							minelocations[j]=true;
+							movedmine=true;
+							break;
+						}
+						if(!movedmine){
+							minesleft.decrement();
+							minecount-=1;
+							blocksleft+=1;
+						}
+					}
+					timer.start();
+				}
+				toshow.push(i);
+				show();
+			}
+			setmousedownblock(i,false);
+			if(!mouseeventoverride && (evt.buttons&(BUTTONS_MASK_LEFT|BUTTONS_MASK_MIDDLE))>0){
+				setface("FACE_MOUTH_OPEN");
+				setmousedown(i,true);
+				if((evt.buttons&(BUTTONS_MASK_RIGHT|BUTTONS_MASK_MIDDLE))>0){
+					setmousedownblock(i,true);
+				}
+			}
+		}
+	}else if(gameactive && primaryprevioustarget==face
+			&& evt.button==BUTTON_MIDDLE && evt.buttons==0){
+		setface("FACE_SMILE_UP");
+	}
+	if(evt.button==BUTTON_LEFT)
+		faceselected = false;
+}
+/*
+Flags the cell (mouse2/long touch action)
+*/
+function flag(m){
+	switch(getcellvalue(m)){
+		case "DEFAULT":
+			minesleft.decrement();
+			setcellvalue(m,"FLAG");
+			break;
+		case "FLAG":
+			minesleft.increment();
+			setcellvalue(m,settings.markenabled ? "MARK" : "DEFAULT");
+			break;
+		case "MARK":
+			setcellvalue(m,"DEFAULT");
+			break;
+		default:
+			break;
+	}
+}
+/*
+Shuffles the array
+*/
+function shuffle(a) {
+	var j, x, i;
+	for (i = a.length - 1; i > 0; i--) {
+		j = Math.floor(Math.random() * (i + 1));
+		x = a[i];
+		a[i] = a[j];
+		a[j] = x;
+	}
+	return a;
+}
+var baseNode = document.createElement("td");{
+	baseNode.textContent="\r\n";
+	setcellvalue(baseNode,"DEFAULT");
+}
+var baseNode_rowEnd = baseNode.cloneNode(true);{
+	baseNode_rowEnd.classList.add("rowend");
+}
+/*
+Starts a new game with the given difficulty, prompting the user if it is to be a custom game.
+*/
+function startgamedifficulty(difficultyname){
+	currentdifficulty = difficultyname.toLowerCase();
+	if(currentdifficulty==customDifficulty)
+		return promptCustomGame();
+	var dif = difficulties[currentdifficulty];
+	startgame(dif.height, dif.width, dif.mines);
+}
+var customgamedialog;
+var customgameokbutton;
+var customgamecancelbutton;
+var customh, customw, customm;
+
+function getValidOrDefault(e, d){
+	var v = e.value;
+	if(v.match(/^\d*$/)){
+		v = Number(v);
+		if(v>e.max)
+			return Number(e.max);
+		if(v<e.min)
+			return Number(e.min);
+		return v;
+	}
+	return d;
+}
+/*
+Prompts the user for the custom game parameters (height, width, mines), and then starts the game
+*/
+function promptCustomGame(){
+	menubars.active=false;
+	customh.value = boardheight;
+	customw.value = boardwidth;
+	customm.value = minecount;
+	
+	customgamedialog.style.visibility="visible";
+	
+	currentdifficulty = customDifficulty;
+}
+/*
+Starts a game with the given board height (`h`), board width (`w`), and number of mines (`m`)
+*/
+function startgame(h = boardheight, w = boardwidth, m = minecount){
+	if(!menubars.active)
+		return;
+	if(failgameshowminelocationstimeout!=null){
+		window.clearTimeout(failgameshowminelocationstimeout);
+		failgameshowminelocationstimeout = null;
+	}
+	timer.stop()
+	timer.reset();
+	board.innerHTML="";
+	boardheight = h;
+	boardwidth = w;
+	minecount = m;
+	boardsize = boardheight*boardwidth;
+	if(minecount>=boardsize)
+		minecount = boardsize-1;
+	blocksleft = boardsize - minecount;
+	minesleft.setValue(minecount);
+	minelocations = shuffle(new Array(boardsize).fill(false).fill(true, 0, minecount));
+	cells = new Array(boardheight);
+	for(var i=0;i<boardsize;){
+		var row = document.createElement("tr");
+		for(var x=0;x<boardwidth;++x,++i){
+			cells[i] = baseNode.cloneNode(true);
+			cells[i].i=i;
+			cells[i].addEventListener('pointerover', minemouseenter);
+			cells[i].addEventListener('pointerout', minemouseleave);
+			row.appendChild(cells[i]);
+		}
+		board.appendChild(row);
+	}
+	setface("FACE_SMILE_UP");
+	primaryprevioustarget = undefined;
+	clickprotected = true;
+	gameactive = true;
+	window.dispatchEvent(new Event('resize'));
+	failgameshowminelocationstimeout = null;
+}
+var failgameshowminelocationstimeout = null;
+/*
+Called on game end.
+param `haswon`: if the player won the game
+*/
+function endgame(haswon){
+	gameactive = false;
+	timer.stop();
+	if(haswon){
+		minesleft.setValue(0);
+		cells.forEach((m)=>{
+			if(ismine(m.i))
+				setcellvalue(m, "FLAG");
+		})
+		setface("FACE_SUNGLASSES");
+		playsound("gamewon");
+		var difficultyname = currentdifficulty.toLowerCase();
+		var timervalue = timer.getValue();
+		failgameshowminelocationstimeout = null;
+		if(difficulties[difficultyname]
+				&& (besttimes[difficultyname].time > timervalue))
+			promptForName();
+	}
+	else{
+		var fg = ()=>{cells.forEach((m)=>{
+			switch(getcellvalue(m)){
+				case "FLAG":
+					if(!ismine(m.i))
+						setcellvalue(m, "MINE_NONE");
+					break;
+				case "MINE_RED":
+				case "MINE_NONE":
+				case "MINE":
+					break;
+				default:
+					if(ismine(m.i))
+						setcellvalue(m, "MINE");
+				break;
+			}
+		})};
+		fg();
+		/*Call the function again to fix a weird bug*/
+		failgameshowminelocationstimeout = window.setTimeout(fg, 1);
+		
+		setface("FACE_DEAD");
+		playsound("minehit");
+	}
+}
+/*
+Information about the active pointer.
+Mainly used with multi-touch screens.
+*/
+var activepointer = {
+			id: -1,
+			clientX: undefined,
+			clientY: undefined,
+			target: undefined,
+		};
+/*
+Loads and initializes all of the game data and variables
+Only called once
+*/
+function init(){
+	/*
+	Initialize the menubars
+	Note: do this BEFORE calling `setsizescale`, otherwise the bounding box will be incorrect.
+	*/
+	initMenubars(menubarbars);
+	
+	besttimesdialog = document.getElementById("besttimesdialog");
+	besttimestablelocation = document.getElementById("besttimestablelocation");
+	besttimesokbutton = document.getElementById("besttimesokbutton");
+	clearbesttimesbutton = document.getElementById("clearbesttimesbutton");
+	customgamedialog = document.getElementById("customgamedialog");
+	customgameokbutton = document.getElementById("customgameokbutton");
+	customgamecancelbutton = document.getElementById("customgamecancelbutton");
+	customh = document.getElementById("customh");
+	customw = document.getElementById("customw");
+	customm = document.getElementById("customm");
+	inputnamedialog = document.getElementById("inputnamedialog");
+	nameinputdifficultyname = document.getElementById("nameinputdifficultyname");
+	nameinputinput = document.getElementById("nameinputinput");
+	namesubmitbutton = document.getElementById("namesubmitbutton");
+	
+	Object.entries(sounds).forEach((collection)=>{
+		Object.entries(collection[1]).forEach((sound,i,a)=>{
+			if((typeof sound[1]) != "object")
+				return;
+			var audionode = document.createElement("audio");
+			audionode.id=collection[0]+"_"+sound[0];
+			audionode.autoplay=false;
+			audionode.loop=false;
+			Object.entries(sound[1]).forEach((s)=>{
+				var sourcenode = document.createElement("source");
+				sourcenode.type = "audio/"+s[0];
+				sourcenode.src = s[1];
+				audionode.appendChild(sourcenode);
+			});
+			//ReactDOM.render(element, document.getElementById('root'));
+			collection[1][sound[0]]=audionode;
+		});
+	})
+	var counters = InitCounters("digitcontainer");
+	timer = counters.digitstimer;
+	minesleft = counters.digitsmines;
+	face = document.getElementById("face");
+	face.addEventListener('pointerenter', facemouseenter);
+	face.addEventListener('pointerleave', facemouseleave);
+	face.addEventListener('click', (e)=>{
+		if(activepointer.id && activepointer.id>=0 && e.pointerId!=activepointer.id)
+			return;
+		startgame();
+	});
+	board = document.getElementById("minesweeperboard");
+	container = document.getElementById("gamecontainer");
+	gamemainarea = document.getElementById("gamemainarea");
+	/*
+	Initialize the window close buttons
+	*/
+	document.getElementsByClassName("closebutton").forEach(a=>{
+		var k=a;
+		while(!k.classList.contains("window"))
+			k=k.parentElement;
+		a.addEventListener("click", ()=>{
+			k.style.visibility="hidden";
+			menubars.active=true;
+		})
+	});
+	/*
+	Disable the context menu
+	*/
+	container.addEventListener('contextmenu', (e)=>{
+		e.preventDefault();
+	});
+	/* See minemousedown */
+	gamemainarea.addEventListener('mousedown', minemousedown);
+	/* See minemouseup */
+	gamemainarea.addEventListener('onmouseup', minemouseup);
+	gamemainarea.addEventListener('mouseup', minemouseup);
+	gamemainarea.addEventListener('pointerup', (e)=>minemouseup(e,e.pointerId));
+	/* See minemousedown */
+	gamemainarea.addEventListener('pointerdown', (e)=>minemousedown(e,e.pointerId));
+	/*
+	Adds a listener to listen to long touch events (basically cancels mouse1 down and calls `flag`)
+	Also puts the nice animated circle visual (see `minesweeperlongpresscirclecontainer`) to see how long one must press the screen
+	*/
+	addLongTouchEventListener(gamemainarea, 900, ((e, washeldlong)=>{
+		var tch = e.changedTouches[0];
+		if(tch.identifier!=activepointer.id)
+			return;
+		var targ = document.elementFromPoint(tch.clientX, tch.clientY);
+		if(washeldlong && gameactive){
+			activepointer.id=-1;
+			setmousedown(targ.i, false);
+			flag(targ);
+			setface("FACE_SMILE_UP");
+		}
+		else
+		{
+			if(!isvalidlocation(targ.i))
+				targ.click();
+			else
+				minemouseup({target:targ,button:0,buttons:0},tch.identifier,true);
+		}
+	}), document.getElementById("minesweeperlongpresscirclecontainer"));
+	/*
+	When a pointer moves
+	*/
+	container.addEventListener('pointermove', (e)=>{
+		if(e.pointerId!=activepointer.id)
+			return;
+		activepointer.clientX = e.clientX;
+		activepointer.clientY = e.clientY;
+		activepointer.target = document.elementFromPoint(e.clientX, e.clientY);
+	});
+	/*
+	Starts a new beginner game on startup
+	*/
+	startgamedifficulty(Object.keys(difficulties)[0]);
+	/*
+	Scales the size of the game to the size of the window
+	*/
+	settings.doautoresizescaling = false;
+	window.addEventListener("resize", ()=>{
+		if(settings.doautoresizescaling)
+			setsizescaletodocumentsize();
+		document.body.style.overflow = settings.doautoresizescaling ? 'hidden' : 'auto';
+	});
+	if(settings.doautoresizescaling){
+		setsizescale(1);
+	}
+	window.dispatchEvent(new Event('resize'));
+	window.setTimeout(()=>{window.dispatchEvent(new Event('resize'));}, 1);
+	
+	/*
+	Best times dialog events
+	*/
+	clearbesttimesbutton.addEventListener('click', (e)=>{
+		clearbesttimes();
+		besttimestablelocation.innerHTML = getBestTimesTable();
+	})
+	besttimesokbutton.addEventListener('click', (e)=>{
+		besttimesdialog.style.visibility="hidden";
+		menubars.active=true;
+	});
+	
+	/*
+	Custom game dialog events
+	*/
+	customgameokbutton.addEventListener('click', (e)=>{
+		customgamedialog.style.visibility="hidden";
+		menubars.active=true;
+		var h = getValidOrDefault(customh, boardheight);
+		var w = getValidOrDefault(customw, boardwidth);
+		var m = getValidOrDefault(customm, minecount);
+		startgame(h,w,m);
+	});
+	customgamecancelbutton.addEventListener('click', (e)=>{
+		customgamedialog.style.visibility="hidden";
+		menubars.active=true;
+	});
+	/*
+	Name input dialog events
+	*/
+	namesubmitbutton.addEventListener('click', (e)=>{
+		inputnamedialog.style.visibility="hidden";
+		menubars.active=true;
+		updatebesttimes(currentdifficulty, timer.getValue(), nameinputinput.value);
+		showbesttimesdialog();
+	});
+
+	//delete window.init;
+}
+document.addEventListener("mouseup", minemouseup);
+document.addEventListener("pointerup", minemouseup);
+document.addEventListener("scroll", evt=>{
+	activepointer.id = -2;
+	if(activepointer.target && activepointer.target.i)
+		setmousedownblock(activepointer.target.i, false);
+	if(getface()=="FACE_MOUTH_OPEN")
+		setface(previousface);
+});
+//return init();
+//});
+</script>
+<script id="TheActualMenubars">
+var menubarbars = {
+	'menubar1': [
+		{
+			text: 'Game',
+			accessKey: 'G',
+			entries: [
+				{
+					text: 'New',
+					fun: (e)=>{
+						startgame()
+					},
+					accessKey: 'N',
+					shortcutkey: "F2",
+				},
+				{
+					separator: true,
+				},
+				{
+					text: 'Beginner',
+					fun: (e)=>{
+						startgamedifficulty("beginner")
+					},
+					checked: true,
+					accessKey: 'B',
+					group: 'difficulties',
+				},
+				{
+					text: 'Intermediate',
+					fun: (e)=>{
+						startgamedifficulty("intermediate")
+					},
+					accessKey: 'I',
+					group: 'difficulties',
+				},
+				{
+					text: 'Expert',
+					fun: (e)=>{
+						startgamedifficulty("expert")
+					},
+					accessKey: 'E',
+					group: 'difficulties',
+				},
+				{
+					text: 'Custom...',
+					fun: (e)=>{
+						startgamedifficulty(customDifficulty)
+					},
+					accessKey: 'C',
+					group: 'difficulties',
+				},
+				{
+					separator: true,
+				},
+				{
+					text: 'Marks',
+					fun: (e)=>{
+						settings.markenabled=!settings.markenabled
+					},
+					toggleable: true,
+					accessKey: 'M',
+					checked: true,
+				},
+				{
+					text: 'Color',
+					fun: (e)=>{
+						var s;
+						if(settings.currentstyle.name.includes('color'))
+							s='mono';
+						else
+							s='color';
+						settings.currentstyle=(s+'_'+(settings.usesvg?'svg':'png'));
+					},
+					toggleable: true,
+					accessKey: 'l',
+					checked: true,
+				},
+				{
+					text: 'Sound',
+					fun: (e)=>{
+						settings.soundsenabled=!settings.soundsenabled
+					},
+					toggleable: true,
+					accessKey: 'S',
+				},
+				{
+					separator: true,
+				},
+				{
+					text: 'Best Times...',
+					fun: (e)=>{
+						showbesttimesdialog();
+					},
+					accessKey: 'T',
+				},/*
+				{
+					separator: true,
+				},
+				{
+					text: 'Exit',
+					fun: (e)=>{
+						//TODO
+					},
+					accessKey: 'x',
+				},*/
+			],
+		},
+		{
+			text: 'Help',
+			accessKey: 'H',
+			entries: [
+				{
+					text: 'Contents',
+					fun: (e)=>{
+						//TODO
+					},
+					accessKey: 'C',
+					shortcutkey: "F1",
+				},
+				{
+					text: 'About Minesweeper...',
+					fun: ()=>{
+						//TODO
+					},
+					accessKey: 'A',
+				},
+			],
+		},
+	],
+};
+</script>
+<script id="SetExtraSettings">
+settings.usesvg = true;
+</script>
+<script id="xyzzycheat">
+(function(){
+	var szXYZZY = "XYZZY".split("");
+	var cchXYZZY = szXYZZY.length;
+	var iXYZZY = 0;
+	var shiftrgx = new RegExp("shift","i");
+	var aXYZZY = false;
+	var eXYZZY = null;
+	window.addEventListener("keydown", function(evt){
+		var k=evt.key;
+		if(k){
+			if(k.match(shiftrgx)){
+				if(iXYZZY >= cchXYZZY){
+					if(eXYZZY == null){
+						eXYZZY = document.getElementById("xyzzy");
+					}
+					eXYZZY.style.visibility = (aXYZZY = !aXYZZY) ? "visible" : "hidden";
+				}
+			}else{
+				if(szXYZZY[iXYZZY] == k.toUpperCase()){
+					++iXYZZY;
+				}else{
+					iXYZZY = 0;
+				}
+			}
+		}
+	}, true);
+	window.addEventListener("pointermove", function(evt){
+		var cell = evt.target;
+		if(aXYZZY && cell.cellIndex){
+			var i = cell.cellIndex + cell.parentElement.rowIndex * (cell.parentElement.childElementCount || cell.parentElement.children.length);
+			eXYZZY.style.backgroundColor = minelocations[i] ? "#000" : "#FFF";
+		}
+	},true);
+})();
+</script>
+</head>
+<body onload="init()">
+<div id="gamecontainerwrapper">
+<div id="xyzzy" style="position: absolute; top: 0; left: 0; height: 1px; width: 1px;"></div>
+<div class="longpresscirclecontainer" id="minesweeperlongpresscirclecontainer">
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+	<circle cx="50" cy="50" r="38">
+	</circle>
+</svg>
+</div>
+<div id="gamecontainer">
+<div id="menubar1"><!-- menubar loads here --></div>
+<div id="gamedialogboxes">
+<div id="inputnamedialog" class="dialog"><div>
+You have the fastest time<br>
+for <span id="nameinputdifficultyname"></span> level.<br>
+Please enter your name.<br>
+<div>
+<input type="text" id="nameinputinput" maxlength="32"/>
+<button id="namesubmitbutton">OK</button>
+</div></div></div>
+<div id="besttimesdialog" class="dialog window">
+<div class="titlebar">
+<img class="icon16">
+Fastest Mine Sweepers
+<button class="closebutton"></button>
+</div>
+<span id="besttimestablelocation"></span>
+<button id="clearbesttimesbutton">Reset Scores</button>
+<button id="besttimesokbutton">OK</button>
+</div>
+<div id="customgamedialog" class="dialog window">
+<div class="titlebar">
+<img class="icon16">
+Custom Field
+<button class="closebutton"></button>
+</div>
+<table>
+<tr>
+<td rowspan="2">Height:</td>
+<td rowspan="2"><input id="customh" type="text" max="30" min="2" maxlength="2"></input></td>
+<td rowspan="3"><button id="customgameokbutton">OK</button></td></tr>
+</tr><tr></tr>
+<tr>
+<td rowspan="2">Width:</td>
+<td rowspan="2"><input id="customw" type="text" max="30" min="2" maxlength="2"></input></td>
+
+</tr><tr>
+<td rowspan="3"><button id="customgamecancelbutton">Cancel</button></td></tr>
+</tr>
+<tr>
+<td rowspan="2">Mines:</td>
+<td rowspan="2"><input id="customm" type="text" max="999" min="1" maxlength="3"></input></td>
+</tr>
+</table>
+
+</div>
+</div>
+<div id="gamemainarea">
+<div id="progresscontainer">
+<div id="digitsmines" class="digitcontainer" digitcount="3"></div>
+<div id="face"></div>
+<div id="digitstimer" class="digitcontainer" digitcount="3" updateaction="increment" autoupdateinterval="1000" limit="timermaxvalue" onvalueupdate="playsound('clocktick')"></div>
+</div>
+<div id="minesweeperboardwrapper">
+<table id="minesweeperboard" class="minesweeperboard">
+</table>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="author" content="Jenna Sloan">
+<title>shmup</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+body {
+	margin: 0;
+	padding: 0;
+}
+svg {
+	border: 1px solid grey;
+	display: block;
+	min-width: max-content;
+	max-width: max-content;
+	min-height: max-content;
+	max-height: max-content;
+}
+#gamecontainer {
+	display: flex;
+	flex-wrap: wrap;
+}
+#game text {
+	fill: white;
+	white-space: pre;
+	dominant-baseline: hanging;
+}
+#hitboxvisualizer rect {
+	outline: 1px solid rgba(255, 255, 255, 0.5);
+	opacity: 0.5;
+}
+#debugcontrols {
+	display: flex;
+	flex-direction: column;
+	width: fit-content;
+	border: 1px solid grey;
+}
+</style>
+<script src="libs/KeyBinds.js" id="KeyBindsScript"></script>
+<script src="libs/SVGTransformUtils.js" id="SVGTransformUtils"></script>
+<script>
+function getSpriteBox(elem){//ignores rotation
+	var w = Number(elem.getAttribute("width"));
+	var h = Number(elem.getAttribute("height"));
+	var ti = getTransformInfo(elem);
+	var x = Number(ti["translate"]?.[0] ?? 0);
+	var y = Number(ti["translate"]?.[1] ?? 0);
+	var si = ti["scale"];
+	var sx = Number(si?.[0] ?? 1);
+	var sy = Number(si?.[1] ?? (si?.[0] ?? 1));
+	return {
+		"top": y,
+		"left": x,
+		"right": x+w*sx,
+		"bottom": y+h*sy,
+	};
+}
+
+function getCollisions(elem, targetClassName="") {
+	//note: getBoundingClientRect can return inconsistent box sizes on rotating shapes
+	var r1 = getSpriteBox(elem);//elem.getBoundingClientRect();
+	/*var chlds = sprites;
+	var colls = [];
+	for(var c of chlds){
+		var r2 = getSpriteBox(c);//c.getBoundingClientRect();
+		if(c!==elem && !(r2.left > r1.right || 
+				r2.right < r1.left || 
+				r2.top > r1.bottom ||
+				r2.bottom < r1.top)){
+			colls.push(c);
+		}
+	}
+	return colls;*/
+	var sq = sprites();
+	if((typeof(targetClassName)=="string") && targetClassName.length > 0){
+		sq = sq.filter(c=>c.classList.contains(targetClassName));
+	}
+	return sq.filter(s=>{
+		var r2 = getSpriteBox(s);//s.getBoundingClientRect();
+		return (s!==elem && !(r2.left > r1.right || 
+				r2.right < r1.left || 
+				r2.top > r1.bottom ||
+				r2.bottom < r1.top));
+	});
+}
+function countdeep(p,a,i){
+	var cob = p[a[i]] ?? {};
+	cob["__count"] = (cob["__count"] ?? 0) + 1;
+	if(a[i+1]){
+		countdeep(cob, a, i+1);
+	}
+	p[a[i]] = cob;
+}
+function writecountdeep(obj, parent, depth){
+	return Object.entries(obj).map(a=>{
+		if(a[0]=="__count"){
+			return parent+": "+a[1];
+		}else{
+			return writecountdeep(a[1], "\u2007\u2007".repeat(depth)+a[0], depth+1);
+		}
+	}).flat();
+}
+var lastfpstime = 0;
+var lasttimedifflog = [];
+const spriteLogic = {
+	"shared": function(time, elem, timediff){
+		//TODO
+		//console.log(arguments);
+	},
+	"fpscounter": function(time, elem, timediffscaled){
+		var timediff = time - lastfpstime;
+		lastfpstime = time;
+		//timediff = timediffscaled / gamespeedmulti;
+		lasttimedifflog.push(timediff);
+		var fpschartelem = document.getElementById("fpschart");
+		if(lasttimedifflog.length > fpschartelem.dataset["maxlasttimediffloglen"]){
+			lasttimedifflog.shift()
+		}
+		var fpschartwidthmulti = Number(fpschartelem.dataset["widthmulti"]);
+		var fpschartheightmulti = Number(fpschartelem.dataset["heightmulti"]);
+		var fpschartwidth = lasttimedifflog.length * fpschartwidthmulti;
+		var fpsavg = (1000/(lasttimedifflog.reduce((a,b)=>a+b)/lasttimedifflog.length)).toFixed(5);
+		var chartavg = fpsavg*fpschartheightmulti;
+		elem.textContent = fpsavg + " fps avg (last "+lasttimedifflog.length+" frames)\n"
+		                 + (1000/timediff).toFixed(5) + " fps";
+		fpschartelem.setAttribute("d", "M"+Object.entries(lasttimedifflog).map(a=>(a[0]*fpschartwidthmulti+","+(1000/a[1]*fpschartheightmulti).toFixed(3))).join(" "));
+		document.getElementById("fpschartavg").setAttribute("d", "M 0,"+chartavg+"h"+fpschartwidth);
+	},
+	"enemy": {
+		"shared": function(time, elem, timediff){
+			//TODO
+		},
+		"enemy1": function(time, elem, timediff){
+			const unitspersecond = 20;
+			var p=getPos(elem);
+			p[0] -= unitspersecond*(timediff/1000);
+			
+			var ew = Number(elem.getAttribute("width"))*getScaleX(elem);
+			if(p[0] < -ew){
+				p[0] += Number(game.getAttribute("width"))+ew;
+			}
+			
+			setPos(elem, p[0], p[1]);
+			//TODO
+		},
+	},
+	"player": {
+		"shared": function(time, elem, timediff){
+			//TODO add damage detection?
+		},
+		"player1": function(time, elem, timediff){
+			const unitspersecond = 320;
+			var p = getPos(elem);
+			p[0] = Number(p[0]);
+			p[1] = Number(p[1]);
+			if(binds.p1_down.active){
+				p[1] += unitspersecond*(timediff/1000);
+			}
+			if(binds.p1_up.active){
+				p[1] -= unitspersecond*(timediff/1000);
+			}
+			if(binds.p1_left.active){
+				p[0] -= unitspersecond*(timediff/1000);
+			}
+			if(binds.p1_right.active){
+				p[0] += unitspersecond*(timediff/1000);
+			}
+			if(p[0] < 0) {
+				p[0] = 0;
+			}
+			if(p[1] < 0) {
+				p[1] = 0;
+			}
+			var gw = Number(game.getAttribute("width"));
+			var ew = Number(elem.getAttribute("width"))*getScaleX(elem);
+			if(p[0] > gw-ew){
+				p[0] = gw-ew;
+			}
+			var gh = Number(game.getAttribute("height"));
+			var eh = Number(elem.getAttribute("height"))*getScaleY(elem);
+			if(p[1] > gh-eh){
+				p[1] = gh-eh;
+			}
+			if(p.includes(NaN)){debugger;}
+			setPos(elem, p[0], p[1]);
+		},
+	},
+	"power": {
+		"shared": function(time, elem, timediff){
+			const unitspersecond = 10;
+			var p = getPos(elem);
+			p[0] = Number(p[0]);
+			p[0] -= unitspersecond*(timediff/1000);
+			var ew = Number(elem.getAttribute("width"))*getScaleX(elem);
+			if(p[0] < -ew){
+				p[0] += Number(game.getAttribute("width"))+ew;
+			}
+			setPos(elem, p[0], p[1]);
+			//TODO
+		},
+		"powerup-piercing": function(time, elem, timediff){
+			var playercollisions = getCollisions(elem, "player");
+			if(playercollisions.length>0){
+				playercollisions[0].dataset["shot"] = "piercing";
+				elem.remove();
+				//TODO
+			}
+			elem.setAttribute("stroke", playercollisions.length>0 ? "purple" : "");
+			elem.setAttribute("stroke-width", playercollisions.length>0 ? "3" : "0");
+			//TODO
+		},
+	},
+	"shot-player": {
+		"shared": function(time, elem, timediff){
+			const unitspersecond = 640;
+			var p = getPos(elem);
+			p[0] = Number(p[0]);
+			p[0] += unitspersecond*(timediff/1000);
+			if(p[0] > Number(game.getAttribute("width"))){
+				elem.remove();//remove shots when they go off the right side of the screen
+				p[0] -= Number(game.getAttribute("width"));
+			}
+			setPos(elem, p[0], p[1]);
+			
+			//TODO
+		},
+		"basic": function(time, elem, timediff){
+			var enemycollisions = getCollisions(elem, "enemy");
+			if(enemycollisions.length>0){
+				elem.remove();
+				enemycollisions[0].dataset["health"] -= 1;
+			}
+			elem.setAttribute("stroke", enemycollisions.length>0 ? "purple" : "");
+			elem.setAttribute("stroke-width", enemycollisions.length>0 ? "3" : "0");
+		},
+		"piercing": function(time, elem, timediff){
+			//don't hit the same enemy more than once?
+			var enemycollisions = getCollisions(elem, "enemy");
+			var oldcollisions = elem.dataset["collisions"]?.split(",") ?? [];
+			if(enemycollisions.length>0){
+				enemycollisions.forEach(enemy=>{
+					if(!oldcollisions.includes(enemy.id)){
+						enemy.dataset["health"] -= 1;
+						oldcollisions.push(enemy.id);
+					}
+				});
+				elem.dataset["collisions"] = oldcollisions.filter(en=>enemycollisions.map(e=>e.id).includes(en)).join(",");
+			}
+			elem.setAttribute("stroke", enemycollisions.length>0 ? "#FF4466" : "");
+			elem.setAttribute("stroke-width", enemycollisions.length>0 ? "3" : "0");
+		},
+	},
+	"shot-enemy": function(time, elem, timediff){
+		const unitspersecond = -320;
+		var p = getPos(elem);
+		p[0] = Number(p[0]);
+		p[0] += unitspersecond*(timediff/1000);
+		var ew = Number(elem.getAttribute("width"))*getScaleX(elem);
+		if(p[0] < -ew){
+			p[0] += Number(game.getAttribute("width"))+ew;
+		}
+		setPos(elem, p[0], p[1]);
+		
+		var playercollisions = getCollisions(elem, "player");
+		if(playercollisions.length>0){
+			//TODO
+		}
+		elem.setAttribute("stroke", playercollisions.length>0 ? "purple" : "");
+		elem.setAttribute("stroke-width", playercollisions.length>0 ? "3" : "0");
+		//TODO
+	}
+};
+
+var sprites = ()=>Array.from(game.children);
+
+function addSprite(name, x, y, scale=null, rotation=null) {
+	var sprite = document.getElementById(name).cloneNode(true);
+	sprite.removeAttribute('id');
+	var newid = 0;
+	while(document.getElementById(newid)){
+		newid++;
+	}
+	sprite.id = newid;
+	game.appendChild(sprite);
+	setPos(sprite, x, y);
+	if(scale != null){
+		setScale(sprite, scale);
+	}
+	if(rotation != null) {
+		setRotation(sprite, rotation);
+	}
+	return sprite;
+}
+var game;
+
+const player_shoot_cooldown = 100;
+var players = [
+	{},
+	{
+		"shoot_cooldown": 0,
+		"last_shot_time": 0,
+		"score": 0,
+	}
+]
+var p1shoot_cooldown = 0;
+var p1_last_shot_time = 0;
+function playershoot(pindex) {
+	let ts = document.timeline.currentTime;
+	let pshoot_cooldown = players[pindex].shoot_cooldown;
+	if(pshoot_cooldown > 0) {
+		pshoot_cooldown = players[pindex].last_shot_time - ts + player_shoot_cooldown;
+	}
+	if(pshoot_cooldown <= 0) {
+		players[pindex].shoot_cooldown = player_shoot_cooldown;
+		players[pindex].last_shot_time = ts;
+		
+		let pelem = sprites().find(a=>a.classList.contains("player"+pindex));
+		let shottypeid = "shot-player-" + pelem.dataset["shot"];
+		
+		shoot(pelem, shottypeid);
+	}
+}
+function shoot(origin, shottypeid){
+	let shotspawnx = Number(getX(origin)) + Number(origin.getAttribute("width"))*getScaleX(origin);
+	let shotspawny = Number(getY(origin)) + Number(origin.getAttribute("height"))/2*getScaleY(origin) - document.getElementById(shottypeid).getAttribute("height")/2;
+	
+	addSprite(shottypeid, shotspawnx, shotspawny);
+}
+
+const binds = {
+//addKeyBind("s", ()=>console.log(bind.key+' is pressed'), (key)=>console.log(key+' is down'), (key)=>console.log(key+' is up'))
+	"p1_down": keybinds[addKeyBind(["ArrowDown"], ()=>{})],
+	"p1_up": keybinds[addKeyBind(["ArrowUp"], ()=>{})],
+	"p1_left": keybinds[addKeyBind(["ArrowLeft"], ()=>{})],
+	"p1_right": keybinds[addKeyBind(["ArrowRight"], ()=>{})],
+	"p1_shoot": keybinds[addKeyBind(["Enter", " ", "Spacebar"], ()=>{playershoot(1);})],
+}
+
+const mintimediff = 1.0/15.0 * 1000;//min 15 fps
+var gamespeedmulti = 1;
+var gamepaused = false;
+var drawhitboxes = false;
+var showmorespriteinfo = false;//TODO
+var showdataviewer = false;
+var showselectors = false;
+var gameframe = 0;
+function gamestart(){
+	if (location.hostname === "localhost" || location.hostname === "127.0.0.1" || location.hostname === "") {
+		//document.getElementById("spritetemplates").style.display = "";
+	}
+	
+	game = document.getElementById("gamespritearea");
+	game.innerHTML="";
+	
+	addSprite("fpscounter", 0, 0);
+	addSprite("test1", 300, 125, 1, -10);
+	addSprite("test2", 300, 220, 4);
+	addSprite("player1", 10, 200);
+	addSprite("powerup-piercing", 200, 200);
+	addSprite("shot-enemy", 200, 211);
+	
+	var lasttime = 0;
+	function nextFrame(time) {
+		var timedif = Math.min(time - lasttime, mintimediff);
+		lasttime = time;
+		if(handleBindings){
+			handleBindings();
+		} else {
+			console.error("KeyBinds.js not found!");
+		}
+		if(!gamepaused){
+			sprites().forEach(a=>{
+				var cl=a.classList;
+				var fs = [spriteLogic];
+				Object.values(cl).forEach((e,ri)=>{
+					fs.push(ri>0 ? fs[fs.length-1][e] : spriteLogic[e]);
+				});
+				//fs.map(f=>{
+				//	return (typeof(f)=="object") ? f["shared"] : f;
+				//});
+				//fs.forEach(f=>f(time, a, timedif));
+				fs.forEach(f=>{
+					return (((typeof(f)=="object") ? f["shared"] : f) ?? (()=>{}))(time, a, timedif*gamespeedmulti);
+				});
+				//spriteLogic[cl[0]]["shared"](time, a, timedif);
+				//spriteLogic[cl[0]][cl[1]](time, a, timedif);
+			});
+		}
+		var hitboxvisualizer = document.getElementById("hitboxvisualizer");
+		hitboxvisualizer.innerHTML = "";
+		if(drawhitboxes){
+			sprites().forEach(a=>{
+				var b = getSpriteBox(a);
+				var r = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+				r.setAttribute('x', b.left);
+				r.setAttribute('y',  b.top);
+				r.setAttribute('height', b.bottom - b.top);
+				r.setAttribute('width',  b.right - b.left);
+				r.setAttribute("fill", "none");
+				r.setAttribute("stroke", "black");//a.getAttribute("fill"));
+				hitboxvisualizer.appendChild(r);
+			});
+		}
+		
+		var sc = document.getElementById("spritecount")
+		sc.textContent = "sprites: "+game.childElementCount;
+		
+		if(showmorespriteinfo){
+			var count = {};
+			sprites().map(a=>Array.from(a.classList)).forEach(a=>{
+				countdeep(count, a, 0);
+			});
+			sc.textContent += "\n" + writecountdeep(count, null, 1).join("\n");
+		}
+		
+		var dv = document.getElementById("dataviewer");
+		dv.innerHTML = "";
+		if(showdataviewer || showselectors){
+			sprites().forEach(a=>{
+				var tc = "";
+				if(showselectors){
+					tc = Array.prototype.join.call(a.classList);
+					if(showdataviewer){
+						tc += "\n";
+					}
+				}
+				if(showdataviewer){
+					tc += Object.entries(a.dataset).map(a=>a[0]+": "+a[1]).join("\n");
+				}
+				if(tc.length > 0){
+					var t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+					var p = getPos(a);
+					t.setAttribute("x", p[0]);
+					t.setAttribute("y", p[1]);
+					t.textContent = tc;
+					dv.appendChild(t);
+				}
+			});
+		}
+		
+		gameframe = window.requestAnimationFrame(nextFrame);
+	}
+	if(gameframe == 0){
+		gameframe = window.requestAnimationFrame(nextFrame);
+	}
+}
+window.addEventListener("load", ()=>{
+    document.querySelectorAll("*[onchange]").forEach(a=>{try{a.onchange();}catch(e){console.error(e);}});
+});
+keybindspreventdefault = false;//for accessibility
+</script>
+</head>
+<body onload="gamestart()">
+<div id="title">Work in progress</div>
+<div id="debugcontrols" role="toolbar">
+Debug Tools
+<button onclick="gamestart()">Restart game</button>
+<span><input type="number" id="gamespeedmulti" onchange="gamespeedmulti = Number(document.getElementById('gamespeedmulti').value)" min="0" max="10" step="0.25" value="1" ><label for="gamespeedmulti">Game Speed Multiplier</label></span>
+<span><input type="checkbox" id="pausegamebox" onchange="gamepaused = document.getElementById('pausegamebox').checked" ><label for="pausegamebox">Pause Game</label></span>
+<span><input type="checkbox" id="drawhitboxes" onchange="drawhitboxes = document.getElementById('drawhitboxes').checked" ><label for="drawhitboxes">Draw Hitboxes</label></span>
+<span><input type="checkbox" id="showmorespriteinfo" onchange="showmorespriteinfo = document.getElementById('showmorespriteinfo').checked" ><label for="showmorespriteinfo">Show detailed sprite info</label></span>
+<span><input type="checkbox" id="showdataviewer" onchange="showdataviewer = document.getElementById('showdataviewer').checked" ><label for="showdataviewer">Show sprites data</label></span>
+<span><input type="checkbox" id="showselectors" onchange="showselectors = document.getElementById('showselectors').checked" ><label for="showselectors">Show logic classes</label></span>
+</div>
+<main id="gamecontainer">
+<svg id="spritetemplates" height="480" width="854" style="display: none" role="img" aria-label="Sprite Templates" >
+	<defs>
+		<!--rect width="10" height="10" fill="inherit" />
+		<rect width="10" height="10" fill="inherit" transform="rotate(45)" transform-origin="5 5" /-->
+		<!-- 10-5*sqrt(2) is about 2.92893 -->
+		<!--   5*sqrt(2) is about  7.07107 -->
+		<!-- 5-5*sqrt(2) is about -2.07107 -->
+		<!-- 5+5*sqrt(2) is about 12.07107 -->
+		<path id="eightpoints" width="10" height="10" d="M 0,0 2.92893,0 5,-2.07107 7.07107,0 10,0 10,2.92893 12.07107,5 10,7.07107 10,10 7.07107,10 5,12.07107 2.92893,10 0,10 0,7.07107 -2.07107,5 0,2.92893 Z" />
+		<path id="fourpoints" width="10" height="10" d="M 3,3 5,-2.07107 7,3 12.07107,5 7,7 5,12.07107 3,7 -2.07107,5 Z" />
+		<path id="tiltsquare" width="10" height="10" d="M 5,-2.07107 12.07107,5 5,12.07107 -2.07107,5 Z" />
+	</defs>
+	<text id="fpscounter" class="fpscounter" alignment-baseline="hanging">0</text>
+	<g id="enemies">
+		<g id="test1" height="50" width="75" class="enemy enemy1" fill="red" data-health="10" >
+			<rect x="25" y="0" width="50" height="50" fill="inherit" />
+			<circle cx="25" cy="25" r="25" fill="inherit" />
+		</g>
+		<rect id="test2" x="100" y="0" width="10" height="10" fill="hsl(0,100%,40%)" class="enemy enemy1" data-health="1" />
+	</g>
+	<g id="powerups">
+		<use href="#eightpoints" id="powerup-piercing" class="power powerup-piercing" width="10" height="10" transform="translate(10 200)" fill="#3333FF" />
+	</g>
+	<g id="players">
+		<rect id="player1" data-shot="basic" x="0" y="100" width="69" height="42" fill="green" class="player player1" />
+	</g>
+	<g id="shots">
+		<use href="#eightpoints" id="shot-player-basic" class="shot-player basic" width="10" height="10" transform="translate(100 200) scale(2 0.75)" fill="green" />
+		<use href="#fourpoints" id="shot-player-piercing" class="shot-player piercing" width="10" height="10" transform="translate(150 200) scale(2 1)" fill="#00CC00" />
+		<use href="#tiltsquare" id="shot-enemy" class="shot-enemy" width="10" height="10" transform="translate(100 220)" fill="red" />
+	</g>
+</svg>
+<svg id="game" height="480" width="854" role="application" aria-label="Game" >
+	<rect id="background" height="100%" width="100%" fill="black" />
+	<g id="gamespritearea" height="480" width="854">
+	</g>
+	<g id="hitboxvisualizer">
+	</g>
+	<g id="debug-info">
+		<path id="fpschart" d="M 0,0 100,100 z" stroke="blue" stroke-width="1" opacity="0.9" fill="none" data-widthmulti="1" data-heightmulti="2" data-maxlasttimediffloglen="300" />
+		<path id="fpschartavg" d="M 0,0 100,100 z" stroke="red" stroke-width="1" opacity="0.3" fill="none" />
+		<text id="spritecount" y="40" ></text>
+		<g id="dataviewer" ></g>
+	</g>
+</svg>
+</main>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<svg width="13px" height="276px" xmlns="http://www.w3.org/2000/svg">
+	<style>
+		svg{
+			background-color: black;
+		}
+		.dd{translate:0   0px;}
+		.dn{translate:0  23px;}
+		.d9{translate:0  46px;}
+		.d8{translate:0  69px;}
+		.d7{translate:0  92px;}
+		.d6{translate:0 115px;}
+		.d5{translate:0 138px;}
+		.d4{translate:0 161px;}
+		.d3{translate:0 184px;}
+		.d2{translate:0 207px;}
+		.d1{translate:0 230px;}
+		.d0{translate:0 253px;}
+		.sa{}
+		.sb{transform: translate(13px,  0px) rotate( 90deg);}
+		.sc{transform: translate(13px, 10px) rotate( 90deg);}
+		.sd{transform: translate(13px, 23px) rotate(180deg);}
+		.se{transform: translate( 0px, 23px) rotate(270deg);}
+		.sf{transform: translate( 0px, 13px) rotate(270deg);}
+		.sg{}
+		use{
+		fill:#fff;}
+	</style>
+	<symbol id="seg">
+		<!-- 0.5px angled corners --><path d="m 2,1.5 l.5,-.5  h8 l.5,.5 l-2.5,2.5 h-4z"/>
+		<!--   1px angled corners --><!--path d="m 2.5,2 l1,-1  h6 l1,1 l-2,2 h-4z"/-->
+		<!--   0.5px flat corners --><!--path d="m 2,1.5 v-.5  h9 v.5 l-2.5,2.5 h-4z"/-->
+		<!--     1px flat corners --><!--path d="m 2.5,2 v-1  h8 v1 l-2,2 h-4z"/-->
+		<!-- sharp pointy corners --><!--path d="m 1.5,1  h10l-3,3h-4z"/-->
+	</symbol>
+	<symbol id="segc">
+		<path d="m 3.5,10  h6l1.5,1.5 -1.5,1.5h-6l-1.5-1.5z" />
+	</symbol>
+	<g>
+		<use href="#seg" class="d9 sa"/>
+		<use href="#seg" class="d8 sa"/>
+		<use href="#seg" class="d7 sa"/>
+		<use href="#seg" class="d6 sa"/>
+		<use href="#seg" class="d5 sa"/>
+		<use href="#seg" class="d3 sa"/>
+		<use href="#seg" class="d2 sa"/>
+		<use href="#seg" class="d0 sa"/>
+		
+		<use href="#seg" class="d9 sb"/>
+		<use href="#seg" class="d8 sb"/>
+		<use href="#seg" class="d7 sb"/>
+		<use href="#seg" class="d4 sb"/>
+		<use href="#seg" class="d3 sb"/>
+		<use href="#seg" class="d2 sb"/>
+		<use href="#seg" class="d1 sb"/>
+		<use href="#seg" class="d0 sb"/>
+		
+		<use href="#seg" class="d9 sc"/>
+		<use href="#seg" class="d8 sc"/>
+		<use href="#seg" class="d7 sc"/>
+		<use href="#seg" class="d6 sc"/>
+		<use href="#seg" class="d5 sc"/>
+		<use href="#seg" class="d4 sc"/>
+		<use href="#seg" class="d3 sc"/>
+		<use href="#seg" class="d1 sc"/>
+		<use href="#seg" class="d0 sc"/>
+		
+		<use href="#seg" class="d9 sd"/>
+		<use href="#seg" class="d8 sd"/>
+		<use href="#seg" class="d6 sd"/>
+		<use href="#seg" class="d5 sd"/>
+		<use href="#seg" class="d3 sd"/>
+		<use href="#seg" class="d2 sd"/>
+		<use href="#seg" class="d0 sd"/>
+		
+		<use href="#seg" class="d8 se"/>
+		<use href="#seg" class="d6 se"/>
+		<use href="#seg" class="d2 se"/>
+		<use href="#seg" class="d0 se"/>
+		
+		<use href="#seg" class="d9 sf"/>
+		<use href="#seg" class="d8 sf"/>
+		<use href="#seg" class="d6 sf"/>
+		<use href="#seg" class="d5 sf"/>
+		<use href="#seg" class="d4 sf"/>
+		<use href="#seg" class="d0 sf"/>
+		
+		<use href="#segc" class="dd sg"/>
+		<use href="#segc" class="d9 sg"/>
+		<use href="#segc" class="d8 sg"/>
+		<use href="#segc" class="d6 sg"/>
+		<use href="#segc" class="d5 sg"/>
+		<use href="#segc" class="d4 sg"/>
+		<use href="#segc" class="d3 sg"/>
+		<use href="#segc" class="d2 sg"/>
+	</g>
+</svg>
