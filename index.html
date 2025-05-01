@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>HTML5 Games Index</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" type="text/css" href="https://jenna1337.github.io/main.css">
+<link rel="stylesheet" type="text/css" href="../main.css">
+<style>
+h2{
+	border-bottom: 1px solid black;
+}
+h3{
+	border-top: 1px dashed black;
+	margin-bottom: 0;
+}
+table, tr, td{
+	border: 2px inset black;
+	border-spacing: 0;
+}
+td{
+	padding: 1ex;
+}
+#targetcontainer {
+	--border-width: 2px;
+	border: var(--border-width) solid CurrentColor;
+	border-width: var(--border-width);
+	flex-grow: 1;
+	box-sizing: border-box;
+	height: calc(100dvh - var(--menubar-holder-height));
+}
+
+/* @supports is for older browsers so it doesn't display an empty block or improperly styled mask */
+@supports (mask-size: contain) and (mask-repeat: no-repeat) and (mask-position: center center) and (mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" height="1" width="1" viewbox="0 0 1 1"></svg>')){
+	/* adds an icon to links for "open in new tab" links and external links */
+	/* Note the [target="_blank"] selector applies to links that open in new tabs,
+	   and the selector checking all the [href] should apply to most external links. */
+	/* Note: it might be faster and more flexible to apply this style in JS */
+	/* a:not(:has(i:empty))[target="_blank"]::after, */
+	/* a:not(:has(i:empty)):not([href^="."]):not([href^="/"]):not([href^="#"]):not([href*="github"])::after,*/
+	.external-link::after {
+		content: "";
+		display: inline-block;
+		height: 2ex;
+		width: 2ex;
+		vertical-align: -0.25ex;
+		margin-inline-start: 0.25ex;
+		mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" height="48" width="48" viewbox="0 0 48 48"><path d="M36 24c-1.2 0-2 .8-2 2v12c0 1.2-.8 2-2 2H10c-1.2 0-2-.8-2-2V16c0-1.2.8-2 2-2h12c1.2 0 2-.8 2-2s-.8-2-2-2H10c-3.4 0-6 2.6-6 6v22c0 3.4 2.6 6 6 6h22c3.4 0 6-2.6 6-6V26c0-1.2-.8-2-2-2z"/><path d="M43.8 5.2c-.2-.4-.6-.8-1-1-.2-.2-.6-.2-.8-.2H30c-1.2 0-2 .8-2 2s.8 2 2 2h7.2L18.6 26.6c-.8.8-.8 2 0 2.8.4.4.8.6 1.4.6s1-.2 1.4-.6L40 10.8V18c0 1.2.8 2 2 2s2-.8 2-2V6c0-.2 0-.6-.2-.8z"/></svg>');
+		mask-size: contain;
+		mask-repeat: no-repeat;
+		mask-position: center center;
+		background-color: currentColor;
+	}
+}
+
+</style>
+<script>
+function focusOnFrame(){
+	document.getElementById("targetcontainer").scrollIntoView();
+}
+</script>
+</head>
+<body style="margin: 0px; padding: 0px; border: none; border-width: 0;">
+<iframe class="MenuBarHolder" src="../MenuBar.html"></iframe>
+<div style="display:flex">
+<div style="flex-grow: 0;flex-shrink: 0;"><table>
+<tbody>
+<tr><td><a onclick="focusOnFrame()" target="targetcontainer" href="Asteroids.html">Asteroids</a></td></tr>
+<tr><td><a onclick="focusOnFrame()" target="targetcontainer" href="collisionTest(Deprecated).html">collisionTest(Deprecated)</a></td></tr>
+<tr><td><a onclick="focusOnFrame()" target="targetcontainer" href="collisionTestCanvas(Old).html">collisionTestCanvas(Old)</a></td></tr>
+<tr><td><a onclick="focusOnFrame()" target="targetcontainer" href="collisionTestCanvas.html">collisionTestCanvas</a></td></tr>
+<tr><td><a onclick="focusOnFrame()" target="targetcontainer" href="InputListener.html">InputListener</a></td></tr>
+<tr><td><a onclick="focusOnFrame()" target="targetcontainer" href="Invaders.html">Invaders</a></td></tr>
+<tr><td><a onclick="focusOnFrame()" target="targetcontainer" href="KeyListener.html">KeyListener</a></td></tr>
+<tr><td><a onclick="focusOnFrame()" target="targetcontainer" href="Solitaire.html">Solitaire</a></td></tr>
+</tbody>
+</table></div>
+<iframe id="targetcontainer" name="targetcontainer" loading="lazy"></iframe>
+</div>
+</body>
+</html>
